@@ -209,11 +209,11 @@ u16 frame[V_ACTIVE][H_STRIDE];
 void VdmaInit()
 {
 	int status;
-	ReadFrameAddr = READ_ADDRESS_BASE;
-	WriteFrameAddr = WRITE_ADDRESS_BASE;
+	ReadFrameAddr    = READ_ADDRESS_BASE;
+	WriteFrameAddr   = WRITE_ADDRESS_BASE;
 	BlockStartOffset = SUBFRAME_START_OFFSET;
-	BlockHoriz = SUBFRAME_HORIZONTAL_SIZE;
-	BlockVert = SUBFRAME_VERTICAL_SIZE;
+	BlockHoriz       = SUBFRAME_HORIZONTAL_SIZE;
+	BlockVert        = SUBFRAME_VERTICAL_SIZE;
 	DISABLE_DCACHE();
 	xil_printf("\r\n--- Entering main() --- \r\n");
 	status = VdmaStart();

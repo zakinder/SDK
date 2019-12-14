@@ -1,9 +1,61 @@
 // LAST TESTED : 05/04/2019
+
 #include "uartio.h"
+
 #include <stdio.h>
 #include <string.h>
-#include <xil_types.h>
+#include <sys/unistd.h>
+#include <xbasic_types.h>
+
+#include "../I2C_D5M/i2c_d5m.h"
 #include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
+#include "../VIDEO_CHANNEL/channel.h"
+
+
+char uart_per_char_read(u32 uart_address)
+{
+	char uart_io;
+    if (uart_address == uart_1_baseaddr)
+        read(1, (char*) &uart_io, 1);
+    return (uart_io);
+}
+
+
+char* char_to_uart(char auserinput[])
+{
+    int nTemp;
+    int i;
+    int nNumberBits = 32;
+    char userinput = 0;
+    int received_uart_data = 0;
+    char nReturnVal = 0;
+    nTemp = bit_expo(2, nNumberBits) - 1;
+    fflush(stdout);
+    while (userinput != 13) {
+        userinput = uart_per_char_read(uart_1_baseaddr);
+            auserinput[received_uart_data++] = userinput;
+            //printf("%s", auserinput);
+            printf("%c", userinput);
+            fflush(stdout);
+
+
+        if (userinput == 13) {
+            for (i = 0; i < received_uart_data; i++) {
+                nReturnVal += auserinput[i] * bit_expo(10, received_uart_data - i - 1);
+            }
+            if (nReturnVal > nTemp)
+                nReturnVal = nTemp;
+        }
+    }
+    printf("\r>>\r\n", nReturnVal);
+    return (nReturnVal);
+}
+// char* char_to_uart(char uart_s[])
+// {
+	// char uart_s = uart_per_char_read(uart_1_baseaddr);
+    // return (uart_s);
+// }
+
 u8 uart_per_byte_read(u32 uart_address) 
 {
     u8 uart_io;
@@ -11,6 +63,8 @@ u8 uart_per_byte_read(u32 uart_address)
         read(1, (char*) &uart_io, 1);
     return (uart_io);
 }
+
+
 u16 uart_two_byte_read(u32 uart_address)
 {
     u16 uart_io;
@@ -167,6 +221,7 @@ void uartvalue()
     printf("uarttester = %i\r\n", ascii_char);
     printf("uarttester = %x\r\n", ascii_char);
     printf("uarttester = %c\r\n", ascii_char);
+    printf("uarttester = %s\r\n", ascii_char);
 }
 /*******************************************************/
 /*
@@ -177,6 +232,7 @@ arg1 value : null or valid_state or invalid_state
              invalid_state : return if user entered invalid state then arg2 is returned.
 arg2 value : depended on arg1 if invalid state then arg2 is returned.
 */
+
 u32 enter_value_or_quit(char s[],u32 current_state)
 {
     u32 value_enter_quit;
@@ -283,113 +339,169 @@ u32 uartcmd(u32 argA,u32 argB)
     if (uartquit == cmds_quit || uartquit == 0x00) {return argA;
     } else {return argB;}
 }
-void keyArrow1Select()
+void d5mgainSelect()
 {
-	int nMenu_State = 1;
-	u8 userinput = 0;
-	u16 testValues = 1;
-	unsigned int uK1 = kCoefVals_kCoef1Cgain_k1;
-	unsigned int uK2 = (~kCoefVals_kCoef1Cgain_k2)&0x00FF;
-	unsigned int uK3 = (~kCoefVals_kCoef1Cgain_k3)&0x00FF;
-	unsigned int uK4 = kCoefVals_kCoef1Cgain_k4;
-	unsigned int uK5 = (~kCoefVals_kCoef1Cgain_k5)&0x00FF;
-	unsigned int uK6 = (~kCoefVals_kCoef1Cgain_k6)&0x00FF;
-	unsigned int uK7 = kCoefVals_kCoef1Cgain_k7;
-	unsigned int uK8 = (~kCoefVals_kCoef1Cgain_k8)&0x00FF;
-	unsigned int uK9 = (~kCoefVals_kCoef1Cgain_k9)&0x00FF;
-	int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
+	d5m_rreg d5m_rreg_ptr;
+	D5mReg(&d5m_rreg_ptr);
+
+	int nMenu_State  = 1;
+	u8 userinput     = 0;
+
+	u16 gain         = d5m_rreg_ptr.green1_gain;
+	u16 exp          = d5m_rreg_ptr.shutter_width_lower;
+
+
+
 	int menu_Active = TRUE;
+	
 	while (menu_Active == TRUE) {
 		switch (nMenu_State) {
+			
 		case menuCheck: //exit keyArrors 19
 			menu_Active = FALSE;
 			break;
+			
 		case menu_select:
+		
             menu_print_prompt();
-            uK1 = kCoefVals_kCoef1Cgain_k1 + testValues;
-            uK2 = (~(kCoefVals_kCoef1Cgain_k2+testValues))&0x00FF;
-            uK3 = (~(kCoefVals_kCoef1Cgain_k3-testValues))&0x00FF;
-            K1 = uK1;
-            K2 = (~uK2);
-            K3 = (~uK3);
-            uK4 = (~(kCoefVals_kCoef1Cgain_k4-testValues))&0x00FF;
-            uK5 = kCoefVals_kCoef1Cgain_k5 + testValues;
-            uK6 = (~(kCoefVals_kCoef1Cgain_k6+testValues))&0x00FF;
-            K4 = (~uK4);
-            K5 = uK5;
-            K6 = (~uK6);
-            uK7 = (~(kCoefVals_kCoef1Cgain_k7+testValues))&0x00FF;
-            uK8 = (~(kCoefVals_kCoef1Cgain_k8-testValues))&0x00FF;
-            uK9 = kCoefVals_kCoef1Cgain_k9 + testValues;
-            K7 = (~uK7);
-            K8 = (~uK8);
-            K9 = uK9;
-            printf("\n"
-            "|-----------------------|\r\n"
-            "|           CG1         |\r\n"
-            "|-----------------------|\r\n"
-            "|%d   |%d   |%d   |\r\n"
-            "|-------|-------|-------|\r\n"
-            "|%d   |%d   |%d   |\r\n"
-            "|-------|-------|-------|\r\n"
-            "|%d   |%d   |%d   |\r\n"
-            "|-------|-------|-------|\r\n",K1,K2,K3,K4,K5,K6,K7,K8,K9);
-			printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
-			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef1Cgain_k1 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef1Cgain_k2 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef1Cgain_k3 - testValues);
-
-		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef1Cgain_k4 - testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef1Cgain_k5 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef1Cgain_k6 + testValues);
-
-		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef1Cgain_k7 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef1Cgain_k8 - testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef1Cgain_k9 + testValues);
-			D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
-			videoFeatureSelect(selCgain);
+			
+            //Select video Coef Vals Updates
+			setColorGain(gain,exp);
+			
+			//User input Keyarrow Direction
 			userinput = keypress_to_uart(uart_1_baseaddr);
+			
+			//Go to Keyarrow Direction State
 			nMenu_State = userinput + 10;
+			
 			break;
-		case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
-			if (testValues <= 1)
-				testValues = 0;   //MINIMUM SET VALUE
+			
+		case KEYPRESS_ARROW_DOWN: 
+			if (gain <= 1)
+				gain = 0;
 			else
-				testValues -= 10;
+				gain -= 1;
 			nMenu_State = menu_select;
 			break;
-		case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
-			if (testValues > 8092)
-				testValues = 8093;//MAXIMUM SET VALUE
+			
+		case KEYPRESS_ARROW_UP:  
+			if (gain > 8092)
+				gain = 8093;
 			else
-				testValues += 10;
+				gain += 1;
 			nMenu_State = menu_select;
 			break;
-		case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
-			if (testValues > 8092)
-				testValues = 8093; //MAXIMUM SET VALUE
+			
+		case KEYPRESS_ARROW_LEFT: 
+			if (exp > 8092)
+				exp = 8093;
 			else
-				testValues += 100;
+				exp += 10;
 			nMenu_State = menu_select;
 			break;
-		case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
-			if (testValues <= 1)
-				testValues = 1;    //MINIMUM SET VALUE
+			
+		case KEYPRESS_ARROW_RIGHT: 
+			if (exp <= 1)
+				exp = 1;
 			else
-				testValues -= 100;
+				exp -= 10;
 			nMenu_State = menu_select;
 			break;
+			
 		default:
 			nMenu_State = menu_select;
 			break;
 		}
 	}
 }
+void keyArrow1Select()
+{
+	int nMenu_State  = 1;
+	u8 userinput     = 0;
+	u16 testValues   = 1;
+    int filterNumber = 0;
+	
+	int menu_Active = TRUE;
+    printf("Enter Filter Number\n");
+    menu_print_prompt();
+    filterNumber = uart_prompt_io();
+	videoFeatureSelect(filterNumber);
+	while (menu_Active == TRUE) {
+		switch (nMenu_State) {
+			
+		case menuCheck: //exit keyArrors 19
+			menu_Active = FALSE;
+			break;
+			
+		case menu_select:
+		
+            menu_print_prompt();
+			
+            //Select video Coef Vals Updates
+
+			
+			//User input Keyarrow Direction
+			userinput = keypress_to_uart(uart_1_baseaddr);
+			//Go to Keyarrow Direction State
+			nMenu_State = userinput + 10;
+			
+			break;
+			
+		case KEYPRESS_ARROW_DOWN: 
+			if (testValues <= 1){
+				testValues = 0;   //MINIMUM SET VALUE
+		     }else{
+				testValues -= 10; //DECREMENT BY 1
+		     }
+
+			videokCoefValsUpdate(testValues,filterNumber);
+			nMenu_State = menu_select;
+			break;
+			
+		case KEYPRESS_ARROW_UP:  
+			if (testValues > 8092){
+				testValues = 8093;//MAXIMUM SET VALUE
+		     }else{
+				testValues += 10; //INCREMENT BY 1
+		     }
+			videokCoefValsUpdate(testValues,filterNumber);
+			nMenu_State = menu_select;
+			break;
+			
+		case KEYPRESS_ARROW_LEFT: 
+			if (testValues > 8092){
+				testValues = 8093; //MAXIMUM SET VALUE
+		     }else{
+				testValues += 100; //INCREMENT BY 2
+		     }
+			videokCoefValsUpdate(testValues,filterNumber);
+			nMenu_State = menu_select;
+			break;
+			
+		case KEYPRESS_ARROW_RIGHT: 
+			if (testValues <= 1){
+				testValues = 1;    //MINIMUM SET VALUE
+		     }else{
+				testValues -= 100; //DECREMENT BY 2
+		     }
+			videokCoefValsUpdate(testValues,filterNumber);
+			nMenu_State = menu_select;
+			break;
+			
+		default:
+			nMenu_State = menu_select;
+			break;
+		}
+	}
+}
+
+
 void keyArrow2Select()
 {
 	int nMenu_State = 1;
 	u8 userinput = 0;
-	u16 testValues = 1;
+	int testValues = 1;
+    int filterNumber = 0;
 	unsigned int uK1 = kCoefVals_kCoef2Cgain_k1;
 	unsigned int uK2 = (~kCoefVals_kCoef2Cgain_k2)&0x00FF;
 	unsigned int uK3 = (~kCoefVals_kCoef2Cgain_k3)&0x00FF;
@@ -401,6 +513,10 @@ void keyArrow2Select()
 	unsigned int uK9 = (~kCoefVals_kCoef2Cgain_k9)&0x00FF;
 	int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
 	int menu_Active = TRUE;
+    printf("Enter Filter Number\n");
+    menu_print_prompt();
+    filterNumber = uart_prompt_io();
+	videoFeatureSelect(filterNumber);
 	while (menu_Active == TRUE) {
 		switch (nMenu_State) {
 		case menuCheck: //exit keyArrors 19
@@ -437,47 +553,47 @@ void keyArrow2Select()
             "|%d   |%d   |%d   |\r\n"
             "|-------|-------|-------|\r\n",K1,K2,K3,K4,K5,K6,K7,K8,K9);
 			printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
-			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef2Cgain_k1 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef2Cgain_k2 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef2Cgain_k3 - testValues);
+			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef2Cgain_k1 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef2Cgain_k2 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef2Cgain_k3 - testValues);//-
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef2Cgain_k4 - testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef2Cgain_k5 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef2Cgain_k6 + testValues);
+		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef2Cgain_k4 - testValues);//-
+		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef2Cgain_k5 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef2Cgain_k6 + testValues);//+
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef2Cgain_k7 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef2Cgain_k8 - testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef2Cgain_k9 + testValues);
+		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef2Cgain_k7 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef2Cgain_k8 - testValues);//-
+		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef2Cgain_k9 + testValues);//+
 			D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
-			videoFeatureSelect(selCgain);
+			//videoFeatureSelect(selCgain);
 			userinput = keypress_to_uart(uart_1_baseaddr);
 			nMenu_State = userinput + 10;
 			break;
 		case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
-			if (testValues <= 1)
-				testValues = 0;   //MINIMUM SET VALUE
-			else
-				testValues -= 10;
+			//if (testValues <= 1)
+			//	testValues = 0;   //MINIMUM SET VALUE
+			//else
+				testValues -= 333;
 			nMenu_State = menu_select;
 			break;
 		case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
-			if (testValues > 8092)
-				testValues = 8093;//MAXIMUM SET VALUE
-			else
-				testValues += 10;
+			//if (testValues > 8092)
+			//	testValues = 8093;//MAXIMUM SET VALUE
+			//else
+				testValues += 333;
 			nMenu_State = menu_select;
 			break;
 		case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
-			if (testValues > 8092)
-				testValues = 8093; //MAXIMUM SET VALUE
-			else
+			//if (testValues > 8092)
+			//	testValues = 8093; //MAXIMUM SET VALUE
+			//else
 				testValues += 100;
 			nMenu_State = menu_select;
 			break;
 		case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
-			if (testValues <= 1)
-				testValues = 1;    //MINIMUM SET VALUE
-			else
+			//if (testValues <= 1)
+			//	testValues = 1;    //MINIMUM SET VALUE
+			//else
 				testValues -= 100;
 			nMenu_State = menu_select;
 			break;
@@ -490,8 +606,9 @@ void keyArrow2Select()
 void keyArrow3Select()
 {
 	int nMenu_State = 1;
-	u8 userinput = 0;
-	u16 testValues = 1;
+	u8 userinput     = 0;
+	u16 testValues   = 1;
+    int filterNumber = 0;
 	unsigned int uK1 = kCoefVals_kCoef7Cgain_k1;
 	unsigned int uK2 = (~kCoefVals_kCoef7Cgain_k2)&0x00FF;
 	unsigned int uK3 = (~kCoefVals_kCoef7Cgain_k3)&0x00FF;
@@ -503,6 +620,10 @@ void keyArrow3Select()
 	unsigned int uK9 = (~kCoefVals_kCoef7Cgain_k9)&0x00FF;
 	int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
 	int menu_Active = TRUE;
+    printf("Enter Filter Number\n");
+    menu_print_prompt();
+    filterNumber = uart_prompt_io();
+	videoFeatureSelect(filterNumber);
 	while (menu_Active == TRUE) {
 		switch (nMenu_State) {
 		case menuCheck: //exit keyArrors 19
@@ -539,48 +660,48 @@ void keyArrow3Select()
             "|%d   |%d   |%d   |\r\n"
             "|-------|-------|-------|\r\n",K1,K2,K3,K4,K5,K6,K7,K8,K9);
 			printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
-			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef7Cgain_k1 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef7Cgain_k2 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef7Cgain_k3 - testValues);
+			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef7Cgain_k1 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef7Cgain_k2 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef7Cgain_k3 - testValues);//-
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef7Cgain_k4 - testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef7Cgain_k5 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef7Cgain_k6 + testValues);
+		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef7Cgain_k4 - testValues);//-
+		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef7Cgain_k5 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef7Cgain_k6 + testValues);//+
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef7Cgain_k7 + testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef7Cgain_k8 - testValues);
-		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef7Cgain_k9 + testValues);
+		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef7Cgain_k7 + testValues);//+
+		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef7Cgain_k8 - testValues);//-
+		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef7Cgain_k9 + testValues);//+
 			D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
-			videoFeatureSelect(selCgain);
+			//videoFeatureSelect(selCgain);
 			userinput = keypress_to_uart(uart_1_baseaddr);
 			nMenu_State = userinput + 10;
 			break;
 		case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
-			if (testValues <= 1)
-				testValues = 0;   //MINIMUM SET VALUE
-			else
-				testValues -= 10;
+		//	if (testValues <= 1)
+		//		testValues = 0;   //MINIMUM SET VALUE
+		//	else
+				testValues -= 777;
 			nMenu_State = menu_select;
 			break;
 		case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
-			if (testValues > 8092)
-				testValues = 8093;//MAXIMUM SET VALUE
-			else
-				testValues += 10;
+			//if (testValues > 8092)
+		//		testValues = 8093;//MAXIMUM SET VALUE
+		//	else
+				testValues += 666;
 			nMenu_State = menu_select;
 			break;
 		case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
-			if (testValues > 8092)
-				testValues = 8093; //MAXIMUM SET VALUE
-			else
-				testValues += 100;
+			//if (testValues > 8092)
+		//		testValues = 8093; //MAXIMUM SET VALUE
+		//	else
+				testValues += 999;
 			nMenu_State = menu_select;
 			break;
 		case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
-			if (testValues <= 1)
-				testValues = 1;    //MINIMUM SET VALUE
-			else
-				testValues -= 100;
+		//	if (testValues <= 1)
+		//		testValues = 1;    //MINIMUM SET VALUE
+		//	else
+				testValues -= 933;
 			nMenu_State = menu_select;
 			break;
 		default:
@@ -593,35 +714,32 @@ void cmds_menu()
 {
 printf(
 "\n"
-"|--------------------------|\n"
-"|D5M RELEASE V12.16.2018   |\n"
-"|--------------------------|\n"
-"|Hardware test             |\n"
-"|--------------------------|\n"
-"| YCBCRENABLE, YCBCRDISABLE|\n"
-"| WSOBEL, WPREWIT, WSHARP  |\n"
-"| WEMBOSS, WBLUR, WCGAIN1  |\n"
-"| WCGAIN2, WCGAIN3, SOBEL  |\n"
-"| RGB, SHARP, BLUR, EMBOSS |\n"
-"| HSV, HSL, RGBREMIX       |\n"
-"| RGBDETECT, RGBPOI, YCBCR |\n"
-"| CGAIN PREWITT  XBRIGHT   |\n"
-"| COLORCORRECTION          |\n"
-"| cmds configd5m           |\n"
-"| cmds videochannel        |\n"
-"| d5m testpattern          |\n"
-"| d5m colorgain            |\n"
-"| xbright                  |\n"
-"| genimage                 |\n"
-"| zoom                     |\n"
-"| colorbars                |\n"
-"| vga                      |\n"
-"| hdmi                     |\n"
-"| fullhdmi                 |\n"
-"| coord                    |\n"
-"| threshold                |\n"
-"| timex                    |\n"
-"|--------------------------|\n");
+"|--------------------------------|\n"
+"| cmds videochannel |rgbselect   |\n"
+"| cmds gridpoint    |vchannel    |\n"
+"| cmds griddelta    |ltselect    |\n"
+"| cmds fifomode     |kernalconfig|\n"
+"| cmds printpixel   |ycbcrenable |\n"
+"| cmds readfifo     |ycbcrdisable|\n"
+"| cmds displaytype  |keygain     |\n"
+"| d5mw testpattern  |hsvpervalue |\n"
+"| d5mw colorgain    |yccpervalue |\n"
+"| d5mw config       |colorgain   |\n"
+"| d5mw update       |d5mgain     |\n"
+"| d5mw exposer      |colorgain   |\n"
+"| d5mw regs         |sdcard      |\n"
+"| d5mr regs         |            |\n"
+"| d5mr exposer      |            |\n"
+"|--------------------------------|\n");
+
+
+
+
+
+
+
+
+
 menu_print_prompt();
 }
 // void cmds_menu() 

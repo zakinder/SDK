@@ -68,6 +68,18 @@
 #define selShpToYcbcr               30
 #define selShpToShp                 31
 #define selShpToBlu                 32
+#define selbluToBlu                 33
+#define selbluToCga                 34
+#define selbluToShp                 35
+#define selbluToYcc                 36
+#define selbluToHsv                 37
+#define selbluToHsl                 38
+#define selbluToCgaShp              39
+#define selbluToCgaShpYcc           40
+#define selbluToCgaShpHsv           41
+#define selbluToShpCga              42
+#define selbluToShpCgaYcc           43
+#define selbluToShpCgaHsv           44
 #define selRgbCorrect               45
 #define selRgbRemix                 46
 #define selRgbDetect                47
@@ -442,12 +454,15 @@ UNSED KERNEL
 #define menuCheck               19
 #define kernalCoef              0
 /*****************************************************************************************************************/
+
+
+
 #define kernalconfig            0x6769666E
 #define clear                   0x10ECC0
 #define mainmenu                0x4773053D
 #define uart_0_baseaddr         0xe0000000
 #define uart_1_baseaddr         0xe0001000
-#define cmds_exposer            0x7265736F
+
 #define timex                   0x137C66
 #define display1                0x429F579F
 #define display2                0x429F57A0
@@ -485,6 +500,7 @@ UNSED KERNEL
 #define wemboss                 0x7C439CD
 #define wblur                   0x13D674
 #define keygain                 0x70F0134
+#define d5mgain                 0x60FE0B4
 /************************************/
 #define hsvpervalue             0xF43BADEF
 #define yccpervalue             0x5E197EEF
@@ -524,11 +540,26 @@ UNSED KERNEL
 #define video30                 0x7B9B962
 #define video31                 0x7B9B963
 #define video32                 0x7B9B964
+#define video33                 0x7B9B965
+#define video34                 0x7B9B966
+#define video35                 0x7B9B967
+#define video36                 0x7B9B968
+#define video37                 0x7B9B969
+#define video38                 0x7B9B96A
+#define video39                 0x7B9B96B
+#define video40                 0x7B9B96C
+#define video41                 0x7B9B96D
+#define video42                 0x7B9B96E
+#define video43                 0x7B9B96F
+#define video44                 0x7B9B970
 #define video45                 0x7B9B971
 #define video46                 0x7B9B972
 #define video47                 0x7B9B973
 #define video48                 0x7B9B974
 #define video49                 0x7B9B975
+#define rgbselect               0xEB7AD0D6
+#define ltselect                0x480A37D6
+#define vchannel                0x4CEB58D6
 #define ycbcrenable             0x511543CD
 #define ycbcrdisable            0x2AC07A9D
 #define ycbcr                   0x1423E0
@@ -561,14 +592,18 @@ UNSED KERNEL
 #define keyarrow3               0xC1D610D5
 #define quit_current_state      0x71
 /*****************************************************************************************************************/
-#define d5m_testpattern         0x2484DA56
-#define d5m_colorgain           0x4EA1D4C4
-#define d5m_channel             0xA20498D6
-#define cmds_readregs           0x67657264
-#define cmds_readexposer        0x6C8BED28
-#define cmds_updated5m          0x64657461
-#define cmds_readd5m            0x6D056464
-#define cmds_configd5m          0x64676966
+#define d5mw_testpattern        0x74617074
+#define d5mw_colorgain          0x6167726F
+#define d5mw_config             0xD1DBE659
+#define d5mw_update             0xD1F75C11
+#define d5mr_regs               0x5E3AC83D
+#define d5mw_regs               0x5E42695D
+#define d5mw_exposer            0x32C3B528
+#define d5mr_exposer            0x14F65028
+/*****************************************************************************************************************/
+#define wsdcard                 0x7D83554
+#define rsdcard                 0x78BEA14
+/*****************************************************************************************************************/
 #define cmds_videochannel       0x68636F65
 #define cmds_displaytype        0x350AAA59
 #define cmdw_vgadraw            0x777617264
@@ -601,5 +636,8 @@ UNSED KERNEL
 #define cmds_gridpoint          0x148D411C
 #define cmds_griddelta          0x148B46A1
 #define sdcard                  0xC06994
+#define wsd                     0x335E
+#define rsd                     0x316A
+
 /*****************************************************************************************************************/
 #endif // __SYSTEM_CONFIG_DEFINES_H__

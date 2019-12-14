@@ -2,14 +2,15 @@
 #include "../SYSTEM_CONFIG_HEADER/system_config_header.h"
 int camera_exposer(u16 exposer_value);
 void pRexposer();
-void d5mtestpattern(u16 pattern_num);
+void d5mwTestpattern(u16 pattern_num);
 void d5mcolorgain();
+void setColorGain(u16 gain,u16 exp);
 u16 img(u16 read_address);
 void camerawrite(u16 value);
 void master_menu();
 void cmd_menu();
 void cameramenu();
-void camera_set_registers();
+void d5mwRegs();
 int img_write_register(u8 address, u16 value);
 int img_by_write_register(u8 address, u32 value);
 void d5m_registers_2xwrite(u8 address, u32 value);
@@ -97,5 +98,6 @@ typedef struct  d5m_reg
 void cameraread(d5m_rreg *d5m_rreg_ptr);
 void D5mReg(d5m_rreg *d5m_rreg_ptr);
 void camerarUpdate();
+void d5mr_reg();
 void read_exposer_register();
 void cameraexposerread(d5m_rreg *d5m_rreg_ptr);

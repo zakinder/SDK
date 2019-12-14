@@ -148,12 +148,15 @@ void CgainConfig(u16 kValues,Coef *pCf) {
     pCf->K1   = CgCf_k1 + kValues;
     pCf->K2   = CgCf_k2 + kValues;
     pCf->K3   = CgCf_k3 - kValues;
+
     pCf->K4   = CgCf_k4 - kValues;
     pCf->K5   = CgCf_k5 + kValues;
     pCf->K6   = CgCf_k6 + kValues;
+
     pCf->K7   = CgCf_k7 + kValues;
     pCf->K8   = CgCf_k8 - kValues;
     pCf->K9   = CgCf_k9 + kValues;
+
 	pCf->Kc   = CgCf_kc;
     CgCoef(pCf);
 }

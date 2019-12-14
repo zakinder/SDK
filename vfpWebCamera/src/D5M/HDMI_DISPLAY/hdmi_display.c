@@ -254,7 +254,7 @@ void d5m_vdma_hdmi(hdmi_display_start *pvideo)
     vfb_common_init(pvideo->uDeviceId_VDMA_HdmiDisplay,&(pvideo->vdma_hdmi));
     vfb_tx_init(&(pvideo->vdma_hdmi),&(pvideo->vdmacfg_hdmi_read),pvideo->hdmio_resolution,pvideo->hdmio_resolution,pvideo->video_address,pvideo->uNumFrames_HdmiDisplay);
     vgen_init( &(pvideo->vtc_hdmio_generator),pvideo->uDeviceId_VTC_HdmioGenerator);
-    vgen_config( &(pvideo->vtc_hdmio_generator),pvideo->hdmio_resolution,0);
+    vgen_config( &(pvideo->vtc_hdmio_generator),pvideo->hdmio_resolution,2);
 }
 void manualVdmaConfig(hdmi_display_start *pvideo)
 {

@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <xbasic_types.h>
 #include <xil_io.h>
-#include <xil_types.h>
 #include <xparameters.h>
 #include "../HDMI_DISPLAY/hdmi_display.h"
 #include "../I2C_D5M/i2c_d5m.h"
-#include "../MENU_CALLS/menu_calls.h"
 #include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
-void d5mInit(){
+#include "../SYSTEM_CONFIG_HEADER/system_config_header.h"
+#include "../VIDEO_FILTERS/filters.h"
+void vdmaHdmiConfig(){
     //DEFAULT CONFIGURABLE
     pvideo.uBaseAddr_IIC_HdmiOut        = XPAR_HDMI_OUTPUT_HDMI_IIC_BASEADDR;
     pvideo.uDeviceId_VTC_HdmioGenerator = XPAR_VIDEO_PIPELINE_TIMMING_CONTROLELR_DEVICE_ID;
@@ -20,22 +20,27 @@ void d5mInit(){
     pvideo.hdmio_resolution             = VIDEO_RESOLUTION_1080P;
     pvideo.hdmio_width_Stride           = SCREEN_WIDTH_HORIZONTAL*2;
     pvideo.hdmio_height                 = SCREEN_HEIGHT_VERTICAL;
-    pvideo.time = (((0x0000ff & D5M_mReadReg(D5M_BASE,r_hour_reg_62))<<16)|((D5M_mReadReg(D5M_BASE,r_min_reg_61) & 0x0000ff)<<8)|(0x0000ff & D5M_mReadReg(D5M_BASE,r_sec_reg_60)));
-    pvideo.exposer           = 0;
-    pvideo.brightness        = 0;
-    pvideo.pixelvalue        = 0;
-    pvideo.sec               = D5M_mReadReg(D5M_BASE,r_sec_reg_60);
-    pvideo.min               = D5M_mReadReg(D5M_BASE,r_min_reg_61);
-    pvideo.hr                = D5M_mReadReg(D5M_BASE,r_hour_reg_62);
+}
+void vfpRgbLevelConfig(){
+    //DEFAULT CONFIGURABLE
     pvideo.fRgbCoordRL       = 0x001E;//1E=30
     pvideo.fRgbCoordRH       = 0x00E6;//E6=230
     pvideo.fRgbCoordGL       = 0x001E;//1E=30
     pvideo.fRgbCoordGH       = 0x0096;//E6=230
     pvideo.fRgbCoordBL       = 0x001E;//1E=30
     pvideo.fRgbCoordBH       = 0x0096;//96=150
+}
+void d5mInit(){
+    pvideo.time = (((0x0000ff & D5M_mReadReg(D5M_BASE,r_hour_reg_62))<<16)|((D5M_mReadReg(D5M_BASE,r_min_reg_61) & 0x0000ff)<<8)|(0x0000ff & D5M_mReadReg(D5M_BASE,r_sec_reg_60)));
+    pvideo.sec               = D5M_mReadReg(D5M_BASE,r_sec_reg_60);
+    pvideo.min               = D5M_mReadReg(D5M_BASE,r_min_reg_61);
+    pvideo.hr                = D5M_mReadReg(D5M_BASE,r_hour_reg_62);
+    pvideo.exposer           = 0;
+    pvideo.brightness        = 0;
+    pvideo.pixelvalue        = 0;
     //DEFAULT ALREADY CONFIG
-    pStream.fDbusSelect      = 0x0004;
-    pStream.fThreshold       = 0x0017;
+    pStream.fDbusSelect      = 0x0000;
+    pStream.fThreshold       = 0x0004;
     pStream.fVideoType       = wSobelRgbDetect;
     pStream.fRgbCoordRL      = 0x001E;//1E=30
     pStream.fRgbCoordRH      = 0x00E6;//E6=230
@@ -43,7 +48,7 @@ void d5mInit(){
     pStream.fRgbCoordGH      = 0x0096;//E6=230
     pStream.fRgbCoordBL      = 0x001E;//1E=30
     pStream.fRgbCoordBH      = 0x0096;//96=150
-    pStream.fPointInterest   = 0x0064;
+    pStream.fPointInterest   = 0x021C;//540
     pStream.fFifoFixedValue  = 0x0004;
     pStream.d5mExposer       = 0x0190;//400
     pStream.d5mBrightness    = 0x0078;//120
@@ -95,17 +100,54 @@ void d5mInit(){
     pcolor.K8   = 0x00FF;//  -0.125
     pcolor.K9   = 0x000B;//   1.375
     pcolor.Kc   = 0x0001;//1 for write and read else read time
+    pCg1.K1     = 0x05DC;//--  1500  =  1.500
+    pCg1.K2     = 0x05DC;//-- -250   = -0.250
+    pCg1.K3     = 0x05DC;//-- -500   = -0.500
+    pCg1.K4     = 0x05DC;//-- -500   = -0.500
+    pCg1.K5     = 0x05DC;//--  1500  =  1.500
+    pCg1.K6     = 0x05DC;//-- -250   = -0.250
+    pCg1.K7     = 0x05DC;//-- -250   = -0.250
+    pCg1.K8     = 0x05DC;//-- -500   = -0.500
+    pCg1.K9     = 0x05DC;//--  1500  =  1.500
+    pCg1.Kc     = 0x0002;
+    pCg2.K1     = 0x05DC;//--  1375  =  1.500
+    pCg2.K2     = 0xFF06;//-- -250   = -0.250
+    pCg2.K3     = 0xFF83;//-- -500   = -0.125
+    pCg2.K4     = 0xFF83;//-- -500   = -0.125
+    pCg2.K5     = 0x05DC;//--  1375  =  1.500
+    pCg2.K6     = 0xFF06;//-- -250   = -0.250
+    pCg2.K7     = 0xFF06;//-- -250   = -0.250
+    pCg2.K8     = 0xFF83;//-- -500   = -0.125
+    pCg2.K9     = 0x05DC;//--  1375  =  1.500
+    pCg2.Kc     = 0x0002;
+    pCg3.K1     = 0x05DC;//--  1375  =  1.500
+    pCg3.K2     = 0xFF83;//-- -250   = -0.125
+    pCg3.K3     = 0xFF83;//-- -500   = -0.125
+    pCg3.K4     = 0xFF83;//-- -500   = -0.125
+    pCg3.K5     = 0x05DC;//--  1375  =  1.500
+    pCg3.K6     = 0xFF06;//-- -250   = -0.125
+    pCg3.K7     = 0xFF83;//-- -250   = -0.125
+    pCg3.K8     = 0xFF83;//-- -500   = -0.125
+    pCg3.K9     = 0x05DC;//--  1375  =  1.500
+    pCg3.Kc     = 0x0002;
     }
+void InitVdmaHdmi(){
+    d5m_vdma_hdmi(&pvideo);
+    VdmaInit();
+}
+void WriteToVfp(){
+    selected_channel();
+    pointInterestFixed();
+    ycbcr_Enable();
+    CgCoef(&pCgCf);
+    videoFeatureSelect(selMaskSobelCga);
+}
 void d5mInitCall(){
     //buffer_vdma_hdmi(&pvideo);
     //colorBars_vdma_hdmi(&pvideo);
     //bars(&pvideo);
-    videoFeatureSelect(pStream.fVideoType);
-    colorFilterFixed();
-    d5m_vdma_hdmi(&pvideo);
-    VdmaInit();
-    selected_channel();
-    pointInterestFixed();
+    //videoFeatureSelect(pStream.fVideoType);
+    //colorFilterFixed();
     //d5mtestpattern(0x0004);
     //exposerCompansate();
 }
@@ -146,20 +188,18 @@ u16 rColorFilterA33()
     return D5M_mReadReg(D5M_BASE,w_a33fl_reg_29);
 }
 void d5mInitPrint(){
-    printf("Firmware Revision Number %x\n\r",(unsigned)D5M_mReadReg(D5M_BASE,r_revisionnumber_reg_63));
-	printf("Current Time\n\r");
-	//printf("%d:%d:%d\n\r",(unsigned) pvideo.hr,(unsigned) pvideo.min,(unsigned) pvideo.sec);
-	printf("Color Filters Kernels Time\n\r");
+    printf("Firmware Revision Number : %x\n\r",(unsigned)D5M_mReadReg(D5M_BASE,r_revisionnumber_reg_63));
+    printf("Color Filters Kernels\n\r");
     colorFilterKc(pcolor.Kc);//writeRead ColorFilter
     printf("%d:%d:%d\n\r",(unsigned) rColorFilterA11,(unsigned) rColorFilterA12,(unsigned) rColorFilterA13);
     printf("%d:%d:%d\n\r",(unsigned) rColorFilterA21,(unsigned) rColorFilterA22,(unsigned) rColorFilterA23);
     printf("%d:%d:%d\n\r",(unsigned) rColorFilterA31,(unsigned) rColorFilterA32,(unsigned) rColorFilterA33);
     colorFilterKc(0x0000);//open else read time
-	printf("Edge Kernels Time\n\r");
+    printf("Edge Kernels\n\r");
     printf("%d:%d:%d\n\r",(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_1_reg_08),(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_2_reg_09),(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_3_reg_10));
     printf("%d:%d:%d\n\r",(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_4_reg_11),(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_5_reg_12),(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_6_reg_13));
     printf("%d:%d:%d\n\r",(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_7_reg_14),(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_8_reg_15),(unsigned) D5M_mReadReg(D5M_BASE,w_kernal_9_reg_16));
-	printf("w_kSet_reg_17\n\r");
+    printf("w_kSet_reg_17\n\r");
     printf("%d\n\r",(unsigned) D5M_mReadReg(D5M_BASE,w_kSet_reg_17));
 }
 void edgeThresholdVal(u16 thresholdValue)
@@ -169,6 +209,103 @@ void edgeThresholdVal(u16 thresholdValue)
 void videoFeatureSelect(u16 videoType)
 {
     D5M_mWriteReg(D5M_BASE,w_videochannel_reg_5,videoType);
+}
+void videokCoefValsUpdate(u16 testValues,int filterNumber)
+{
+	//------------------------------------------------------------------------------
+	unsigned int uK1 = 0;
+	unsigned int uK2 = 0;
+	unsigned int uK3 = 0;
+	unsigned int uK4 = 0;
+	unsigned int uK5 = 0;
+	unsigned int uK6 = 0;
+	unsigned int uK7 = 0;
+	unsigned int uK8 = 0;
+	unsigned int uK9 = 0;
+	int K1 = 0;
+	int K2 = 0;
+	int K3 = 0;
+	int K4 = 0;
+	int K5 = 0;
+	int K6 = 0;
+	int K7 = 0;
+	int K8 = 0;
+	int K9 = 0;
+	//------------------------------------------------------------------------------
+	printf("before\n");
+	printf("%d\n",pCg1.K1);
+	printf("%d\n",pCg1.K2);
+	printf("%d\n",pCg1.K3);
+	printf("%d\n",pCg1.K4);
+	printf("%d\n",pCg1.K5);
+	printf("%d\n",pCg1.K6);
+	printf("%d\n",pCg1.K7);
+	printf("%d\n",pCg1.K8);
+	printf("%d\n",pCg1.K9);
+	pCg1.K1 = pCg1.K1 + testValues - pCg1.K2 - pCg1.K3;
+	pCg1.K2 = pCg1.K2 - testValues;
+	pCg1.K3 = pCg1.K3 - testValues;
+	pCg1.K4 = pCg1.K4 - testValues;
+	pCg1.K5 = pCg1.K5 + testValues - pCg1.K4 - pCg1.K6;
+	pCg1.K6 = pCg1.K6 - testValues;
+	pCg1.K7 = pCg1.K7 - testValues;
+	pCg1.K8 = pCg1.K8 - testValues;
+	pCg1.K9 = pCg1.K9 + testValues - pCg1.K7 - pCg1.K8;
+	printf("after\n");
+	printf("%d\n",pCg1.K1);
+	printf("%d\n",~pCg1.K2);
+	printf("%d\n",~pCg1.K3);
+	printf("%d\n",~pCg1.K4);
+	printf("%d\n",pCg1.K5);
+	printf("%d\n",~pCg1.K6);
+	printf("%d\n",~pCg1.K7);
+	printf("%d\n",~pCg1.K8);
+	printf("%d\n",pCg1.K9);
+    uK1 = (pCg1.K1 + testValues);
+    uK2 = (~(pCg1.K2-testValues))&0x00FF;
+    uK3 = (~(pCg1.K3-testValues))&0x00FF;
+    uK4 = (~(pCg1.K4-testValues))&0x00FF;
+    uK5 = (pCg1.K5 + testValues);
+    uK6 = (~(pCg1.K6-testValues))&0x00FF;
+    uK7 = (~(pCg1.K7-testValues))&0x00FF;
+    uK8 = (~(pCg1.K8-testValues))&0x00FF;
+    uK9 = (pCg1.K9 + testValues);
+    //------------------------------------------------------------------------------
+    //For Print Purpose Only
+    K1  = (uK1);
+    K2  = (~uK2);
+    K3  = (~uK3);
+    K4  = (~uK4);
+    K5  = uK5;
+    K6  = (~uK6);
+    K7  = (~uK7);
+    K8  = (~uK8);
+    K9  = (uK9);
+            printf("         %d",(unsigned)testValues);
+            printf("\n"
+            "|-----------------------|\r\n"
+            "|           CG1         |\r\n"
+            "|-----------------------|\r\n"
+            "|%d   |%d   |%d   |\r\n"
+            "|-------|-------|-------|\r\n"
+            "|%d   |%d   |%d   |\r\n"
+            "|-------|-------|-------|\r\n"
+            "|%d   |%d   |%d   |\r\n"
+            "|-------|-------|-------|\r\n",K1,K2,K3,K4,K5,K6,K7,K8,K9);
+            //------------------------------------------------------------------------------
+            //Write Coef Values to Cgain Logic Filter
+            D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,pCg1.K1);
+            D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,pCg1.K2);
+            D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,pCg1.K3);
+            D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,pCg1.K4);
+            D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,pCg1.K5);
+            D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,pCg1.K6);
+            D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,pCg1.K7);
+            D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,pCg1.K8);
+            D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,pCg1.K9);
+            D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,pCg1.Kc);
+            //Select Video to be Cgain
+            //videoFeatureSelect(selCgain);
 }
 void ycbcrSelect(u16 videoType)
 {
@@ -203,13 +340,13 @@ void pointInterestFixed()
 void colorHsvPerCh(u16 PerChValue)
 {
     if (PerChValue == 1) {
-    	colorHsvPerChH();
+        colorHsvPerChH();
     }else if (PerChValue == 2){
-    	colorHsvPerChS();
+        colorHsvPerChS();
     }else if (PerChValue == 3){  
-    	colorHsvPerChV();
+        colorHsvPerChV();
     }else{
-    	colorHsvPerChHsv();
+        colorHsvPerChHsv();
     }
 }
 void colorHsvPerChHsv()
@@ -231,13 +368,13 @@ void colorHsvPerChV()
 void colorYCbCrPerCh(u16 PerChValue)
 {
     if (PerChValue == 1) {
-    	colorYCbCrPerChY();
+        colorYCbCrPerChY();
     }else if (PerChValue == 2){
-    	colorYCbCrPerChCb();
+        colorYCbCrPerChCb();
     }else if (PerChValue == 3){  
-    	colorYCbCrPerChCr();
+        colorYCbCrPerChCr();
     }else{
-    	colorYCbCrCh();
+        colorYCbCrCh();
     }
 }
 void colorYCbCrCh()
@@ -260,9 +397,18 @@ void lum_ThresholdValue(u16 lumThresholdValue)
 {
     D5M_mWriteReg(D5M_BASE,w_lumTh_reg_56,lumThresholdValue);
 }
+void lThSelect(u16 lThSelectValue)
+{
+    D5M_mWriteReg(D5M_BASE,w_lumTh_reg_56,lThSelectValue);
+}
+
+void rawRgbSelect(u16 rawRgbSelectValue)
+{
+    D5M_mWriteReg(D5M_BASE,w_abusselect_reg_3,rawRgbSelectValue);
+}
 void ReadDataByte(u16 Value)
 {
-	D5M_mWriteReg(D5M_BASE,w_gridlockaddress_reg_36,(Value | 0x00010000));
+    D5M_mWriteReg(D5M_BASE,w_gridlockaddress_reg_36,(Value | 0x00010000));
     u16 AdrValue = D5M_mReadReg(D5M_BASE,r_readaddress_reg_36);
     printf("%d %d %d %d\n\r",(unsigned) AdrValue ,(unsigned) ((D5M_mReadReg(D5M_BASE,r_gridlockdatai_reg_38)) & 0xff),((unsigned) ((D5M_mReadReg(D5M_BASE,r_gridlockdatai_reg_38)) & 0xff00)>>8),(unsigned) ((D5M_mReadReg(D5M_BASE,r_gridlockdatai_reg_38)) & 0xff0000)>>16);
 }
@@ -313,7 +459,7 @@ void readGData(u16 edgeTypeValue)
       }
       pvideo.fifoEmptyh  = D5M_mReadReg(D5M_BASE,r_fifoemptyh_reg_40);
       if (pvideo.fifoEmptyh == 0x1){
-    	  printf("fifoEmptyh was Empty so set to w_cpuackgoagain_reg_33\n\r");
+          printf("fifoEmptyh was Empty so set to w_cpuackgoagain_reg_33\n\r");
           cpuackgoagain(edgeTypeValue);
       }
 }
@@ -323,7 +469,7 @@ void cpuackgoagain(u16 valueIn)
 }
 void gridlock(u16 valueIn)
 {
-	D5M_mWriteReg(D5M_BASE,w_cpuwgridlock_reg_34,valueIn);
+    D5M_mWriteReg(D5M_BASE,w_cpuwgridlock_reg_34,valueIn);
 }
 void enState()
 {
@@ -359,15 +505,15 @@ void readFifo()
 }
 void enableNextRead(u16 eValue)
 {
-  D5M_mWriteReg(D5M_BASE,w_cpuackgoagain_reg_33,eValue);	
+  D5M_mWriteReg(D5M_BASE,w_cpuackgoagain_reg_33,eValue);    
 }
 /*****************************************************************************************************************/
 void edgeType(u16 edgeTypeValue)
 {
     if (edgeTypeValue == 1) {
-    	SobelCoefsUpdate();
+        SobelCoefsUpdate();
     }else{
-    	PrewitCoefsUpdate();
+        PrewitCoefsUpdate();
     }
 }
 void selected_channel()
@@ -392,7 +538,6 @@ void selected_channel()
     D5M_mWriteReg(D5M_BASE,w_abusselect_reg_3,pStream.fDbusSelect);
     edgeThresholdVal(pStream.fThreshold);
     //prewittWrite();
-    videoFeatureSelect(pStream.fVideoType);
 }
 void colorDetectRange(u16 fRgbCoordRL,u16 fRgbCoordRH,u16 fRgbCoordGL,u16 fRgbCoordGH,u16 fRgbCoordBL,u16 fRgbCoordBH)
 {

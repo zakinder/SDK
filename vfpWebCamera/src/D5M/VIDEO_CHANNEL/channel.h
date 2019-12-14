@@ -41,6 +41,9 @@ void pRbrightness();
 void selected_channel();
 void edgeThresholdVal(u16 thresholdValue);
 void videoFeatureSelect(u16 videoType);
+
+
+void WrDataSd();
 void edgeType(u16 edgeTypeValue);
 void edgeColor(u16 edgeColorVal);
 void cpuackgoagain(u16 valueIn);
@@ -57,6 +60,10 @@ void readGDataContinueMode();
 void readGDataStopMode();
 void pointInterestFixed();
 void framefifoFixed();
+void vdmaHdmiConfig();
+void vfpRgbLevelConfig();
+void InitVdmaHdmi();
+void WriteToVfp();
 void d5mInit();
 void d5mInitCall();
 void d5mInitPrint();
@@ -83,6 +90,9 @@ void colorYCbCrPerChY();
 void colorYCbCrPerChCb();
 void colorYCbCrPerChCr();
 void lum_ThresholdValue(u16 lumThresholdValue);
+void lThSelect(u16 lumThresholdValue);
+void rawRgbSelect(u16 rawRgbSelectValue);
 void colorYCbCrPerCh(u16 PerChValue);
 void colorHsvPerCh(u16 PerChValue);
+void videokCoefValsUpdate(u16 testValues,int filterNumber);
 #endif // __CHANNEL_H__

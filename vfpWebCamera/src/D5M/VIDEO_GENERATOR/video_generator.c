@@ -82,12 +82,12 @@ int vgen_config(XVtc *pVtc, int ResolutionId, int bVerbose)
     /* Set up Polarity of all outputs */
     memset((void *)&Polarity, 0, sizeof(Polarity));
     Polarity.ActiveChromaPol = 1;
-    Polarity.ActiveVideoPol = 1;
-    Polarity.FieldIdPol = 0;
-    Polarity.VBlankPol = 1;
-    Polarity.VSyncPol = VSyncPol;
-    Polarity.HBlankPol = 1;
-    Polarity.HSyncPol = HSyncPol;
+    Polarity.ActiveVideoPol  = 1;
+    Polarity.FieldIdPol      = 0;
+    Polarity.VBlankPol       = 1;
+    Polarity.VSyncPol        = VSyncPol;
+    Polarity.HBlankPol       = 1;
+    Polarity.HSyncPol        = HSyncPol;
     /* Set up Generator */
     memset((void *)&Signal, 0, sizeof(XVtc_Signal));
     Signal.OriginMode = 1; //Set Frame Origin to Start of Active Video

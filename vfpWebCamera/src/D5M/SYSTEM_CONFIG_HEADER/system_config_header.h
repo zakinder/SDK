@@ -35,6 +35,7 @@ struct videoStreamStruct
 };
 typedef struct videoStreamStruct videoStreamInit;
 videoStreamInit pStream;
+
 struct kernelStruct
 {
    Xuint16 K1;
@@ -48,11 +49,16 @@ struct kernelStruct
    Xuint16 K9;
    Xuint16 Kc;
 };
-typedef struct kernelStruct sobelInit;
-sobelInit pprewitt;
-sobelInit psobel;
-typedef struct kernelStruct colorInit;
-colorInit pcolor;
+
+typedef struct kernelStruct kernelVal;
+
+kernelVal pprewitt;
+kernelVal psobel;
+kernelVal pcolor;
+kernelVal pCg1;
+kernelVal pCg2;
+kernelVal pCg3;
+
 struct struct_hdmi_display_start
 {
    Xuint32 uBaseAddr_IIC_HdmiOut;

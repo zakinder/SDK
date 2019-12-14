@@ -16,15 +16,18 @@ KERNELS
 #define YcCf_k9                    0xFFB9//--  1500  = -0.071
 #define YcCf_kc                    0x0001//--  1
 //CGAIN -->ID: 2
-#define CgCf_k1                    0x05DC//--  1500  =  1.500
-#define CgCf_k2                    0xFF06//-- -250   = -0.250
+#define CgCf_k1                    0x1138//-5000//0x05DC//--  1500  =  1.500
+#define CgCf_k2                    0xFE0C//-800//-- -250   = -0.250
 #define CgCf_k3                    0xFE0C//-- -500   = -0.500
+
 #define CgCf_k4                    0xFE0C//-- -500   = -0.500
-#define CgCf_k5                    0x05DC//--  1500  =  1.500
-#define CgCf_k6                    0xFF06//-- -250   = -0.250
-#define CgCf_k7                    0xFF06//-- -250   = -0.250
+#define CgCf_k5                    0x07D0//2000//--  1500  =  1.500
+#define CgCf_k6                    0xFE0C//-- -250   = -0.250
+
+#define CgCf_k7                    0xFE0C//-- -250   = -0.250
 #define CgCf_k8                    0xFE0C//-- -500   = -0.500
-#define CgCf_k9                    0x05DC//--  1500  =  1.500
+#define CgCf_k9                    0x1138//-5000//0x05DC//--  1500  =  1.500
+
 #define CgCf_kc                    0x0002//--  2
 //SHARP -->ID: 3
 #define ShCf_k1                    0x0000//--  0

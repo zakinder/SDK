@@ -160,8 +160,8 @@ void d5m_config1() {
     d5m_registers_write(152,0);        // disble calibration
     d5m_registers_write(1,54);         // sensor_start_row
     d5m_registers_write(2,16);         // sensor_start_column
-    d5m_registers_write(3,959);        // sensor_row_size
-    d5m_registers_write(4,1279);       // sensor_column_size
+    d5m_registers_write(3,480);        // sensor_row_size
+    d5m_registers_write(4,640);       // sensor_column_size
     d5m_registers_write(34,0);         // sensor_row_mode
     d5m_registers_write(35,0);         // sensor_column_mode
     d5m_registers_write(73,424);       // row black target
@@ -180,15 +180,15 @@ void d5m_config2() {
     d5m_registers_write(46,3);         // [h2E][h0013]Green 2 Gain
     d5m_registers_write(16,81);        // [h10][h0051]set up PLL power on
     d5m_registers_write(17,6151);      // [h11][h1f04]PLL_m_Factor<<8+PLL_n_Divider
-    d5m_registers_write(18,2);         // [h12][h0001]PLL_p1_Divider
+    d5m_registers_write(18,1);         // [h12][h0001]PLL_p1_Divider
     usleep(1000);                      //1ms
     d5m_registers_write(16,83);        // [h10][h0053]set USE PLL
     usleep(1000);                      //1ms
     d5m_registers_write(152,0);        // [h98][h1807]disble calibration
     d5m_registers_write(1,54);         // [h01][h0036]sensor_start_row
     d5m_registers_write(2,16);         // [h02][h0010]sensor_start_column
-    d5m_registers_write(3,959);        // [h03][h03BF]sensor_row_size
-    d5m_registers_write(4,1279);       // [h04][h04FF]sensor_column_size
+    d5m_registers_write(3,480);        // [h03][h03BF]sensor_row_size
+    d5m_registers_write(4,640);       // [h04][h04FF]sensor_column_size
     d5m_registers_write(34,0);         // [h22][h0000]sensor_row_mode
     d5m_registers_write(35,0);         // [h23][h0000]sensor_column_mode
     d5m_registers_write(73,424);       // [h49][h01A8]row black target
@@ -214,8 +214,8 @@ void d5m_config3() {
     d5m_registers_write(152,0);        // [h98][h1807]disble calibration
     d5m_registers_2xwrite(1,65536);    // [h01][h10000]sensor_start_row
     d5m_registers_2xwrite(2,131072);   // [h02][h20000]sensor_start_column
-    d5m_registers_2xwrite(3,198527);   // [h03][h3077F]sensor_row_size
-    d5m_registers_write(4,1279);       // [h04][h04FF]sensor_column_size
+    d5m_registers_2xwrite(3,480);   // [h03][h3077F]sensor_row_size
+    d5m_registers_write(4,640);       // [h04][h04FF]sensor_column_size
     d5m_registers_2xwrite(34,2228241); // [h22][h220011]sensor_row_mode
     d5m_registers_2xwrite(35,2293777); // [h23][h230011]sensor_column_mode
     d5m_registers_write(73,424);       // [h49][h01A8]row black target
@@ -309,43 +309,87 @@ void pRexposer(){
     pvideo.exposer = d5mregread(0x009);
     printf("Exposer :%i\n",(unsigned)pvideo.exposer);
 }
+void d5mReadColorGainExpos(d5m_rreg *d5m_rreg_ptr) {
+    xil_printf("\n\r");
+    xil_printf("\t [1943 ]-SHUTTER WIDTH LOWER    = 0x%04d\n\r",d5m_rreg_ptr->shutter_width_lower);
+    xil_printf("\t [8    ]-GREEN1 GAIN            = 0x%04d\n\r",d5m_rreg_ptr->green1_gain);
+    xil_printf("\t [8    ]-BLUE   GAIN            = 0x%04d\n\r",d5m_rreg_ptr->blue_gain);
+    xil_printf("\t [8    ]-RED    GAIN            = 0x%04d\n\r",d5m_rreg_ptr->red_gain);
+    xil_printf("\t [8    ]-GREEN2 GAIN            = 0x%04d\n\r",d5m_rreg_ptr->green2_gain);
+}
+
 void d5mcolorgain() {
-    int ret = 0;
-    u32 g1= 0;
-    u32 g2= 0;
-    u32 blue= 0;
-    u32 red= 0;
-    u32 exp= 0;
-            printf("Enter Green1 Gain Value\n");
-            menu_print_prompt();
-            g1 = uart_prompt_io();
-            printf("Enter Blue Gain Value\n");
-            menu_print_prompt();
-            blue = uart_prompt_io();
-            printf("Enter Red Gain Value\n");
-            menu_print_prompt();
-            red = uart_prompt_io();
-            printf("Enter Green2 Gain Value\n");
-            menu_print_prompt();
-            g2 = uart_prompt_io();
-            printf("Enter Exposer Value\n");
-            menu_print_prompt();
-            exp = uart_prompt_io();
-    ret = img_write_register(43,g1);//Green1 Gain
+	
+    int ret  = 0;
+    u32 gr1  = 0;
+    u32 gr2  = 0;
+    u32 blu  = 0;
+    u32 red  = 0;
+    u32 exp  = 0;
+	
+    printf("Enter Green1 Gain Value\n");
+    menu_print_prompt();
+    gr1 = uart_prompt_io();
+	
+    printf("Enter Blue Gain Value\n");
+    menu_print_prompt();
+    blu = uart_prompt_io();
+	
+    printf("Enter Red Gain Value\n");
+    menu_print_prompt();
+    red = uart_prompt_io();
+	
+    printf("Enter Green2 Gain Value\n");
+    menu_print_prompt();
+    gr2 = uart_prompt_io();
+	
+    printf("Enter Exposer Value\n");
+    menu_print_prompt();
+    exp = uart_prompt_io();
+	
+    ret = img_write_register(43,gr1);   //Green1 Gain
     usleep(1);
-    ret |= img_write_register(44,blue);//Blue Gain
+    ret |= img_write_register(44,blu);//Blue Gain
     usleep(1);
-    ret |= img_write_register(45,red);//Red Gain
+    ret |= img_write_register(45,red); //Red Gain
     usleep(1);
-    ret |= img_write_register(46,g2);//Green2 Gain
+    ret |= img_write_register(46,gr2);  //Green2 Gain
     usleep(1);
-    ret |= img_write_register(9,exp);//Green2 Gain
+    ret |= img_write_register(9,exp);  //frame exposer
     usleep(1);
+
+	
     //or combine check
     if (ret == 1)    print("transmitted\n");
     else print("more bytes to transmit-- check error\n");
+
 }
-void d5mtestpattern(u16 pattern_num) {
+
+void setColorGain(u16 gain,u16 exp) {
+	
+    int ret  = 0;
+
+    ret = img_write_register(43,gain); //Green1 Gain
+    usleep(1);
+    ret |= img_write_register(44,gain);//Blue Gain
+    usleep(1);
+    ret |= img_write_register(45,gain);//Red Gain
+    usleep(1);
+    ret |= img_write_register(46,gain);//Green2 Gain
+    usleep(1);
+    ret |= img_write_register(9,exp);  //frame exposer
+    usleep(1);
+	
+    //or combine check
+    if (ret == 1)    print("Transmitted\n");
+    else print("more bytes to transmit-- check error\n");
+	//read registers
+	D5mReg(&d5m_rreg_ptr);
+	d5mReadColorGainExpos(&d5m_rreg_ptr);
+
+}
+
+void d5mwTestpattern(u16 pattern_num) {
     int ret = 0;
     ret = img_write_register(161,50); //Test_Pattern_Green
     ret = img_write_register(162,100);//Test_Pattern_Red
@@ -462,7 +506,7 @@ void camera_set_registersv1() {
     ret |=  img_write_register(0x0A2,R_A2_value);
     printf("Test Pattern Red: H: %02x , D: %d\n",R_A2_value,R_A2_value);
 }
-void camera_set_registers() {
+void d5mwRegs() {
     int ret = 0;
     u16 R_01_value = 0x0036; //    set start row
     u16 R_02_value = 0x0010; //    set start column
@@ -677,29 +721,40 @@ void camerarUpdate() {
     cameraread(&d5m_rreg_ptr);
     printf("D5mRegs Updated\n");
 }
+void d5mr_reg() {
+    d5m_rreg d5m_rreg_ptr;
+    D5mReg(&d5m_rreg_ptr);//read values from d5m device
+    cameraread(&d5m_rreg_ptr);
+    printf("D5mRegs Updated\n");
+}
+
 void camera_hdmi_config() {
     int ret = 0;
     u16 R_01_value = 0x0036; //    set start row
     u16 R_02_value = 0x0010; //    set start column
     u16 R_03_value = 0x0437; //    set row size    1080[438] 400[190]
-    u16 R_04_value = 0x0781; //    set column size 1920[780] 600[258]
+    u16 R_04_value = 0x0780; //    set column size 1920[780] 600[258]
     u16 R_05_value = 0x0000; //    H_Blanking
     u16 R_06_value = 0x0008; //    V_Blanking
     u16 R_0A_value = 0x8000; //    change latch
-    u16 camera_exposer_value =0x03E8;// should be less then R_03_value
+
+    u16 camera_exposer_value =0x03e8;// should be less then R_03_value
+
+
     u16 R_10_value = 0x0051; //    set up PLL power on
-    u16 R_11_value = 0x1807; //    PLL_m_Factor<<8+PLL_n_Divider
-    u16 R_12_value = 0x0002; //    PLL_p1_Divider
+    u16 R_11_value = 0x1409; //PLL_m_Factor<<8+PLL_n_Divider
+    u16 R_12_value = 0x0001; // PLL_p1_Divider
     u16 R_1X_value = 0x0053; //    set USE PLL
+
     u16 R_20_value = 0xc040; //    Mirror Row and Columns
     u16 R_22_value = 0x0000; //    set row mode in bin mode
     u16 R_23_value = 0x0000; //    set column mode     in bin mode
     u16 R_2B_value = 0x0002; // 43[15] Green 1 Gain
-    u16 R_2C_value = 0x0004; // 44[15] Blue Gain
-    u16 R_2D_value = 0x0004; // 45[15] Red Gain
+    u16 R_2C_value = 0x0003; // 44[15] Blue Gain
+    u16 R_2D_value = 0x0003; // 45[15] Red Gain
     u16 R_2E_value = 0x0002; // 46[15] Green 2 Gain
-    u16 reset_h = 0x0001;
-    u16 reset_l = 0x0000;
+    u16 reset_h    = 0x0001;
+    u16 reset_l    = 0x0000;
     u16 R_98_value = 0x0000; // 152[15] disble calibration
     u16 R_A0_value = 0x0000; // 160[15] Test pattern control
     u16 R_A1_value = 0x0000; // 161[15] Test green pattern value
@@ -720,12 +775,7 @@ void camera_hdmi_config() {
     ret |=  img_write_register(0x006,R_06_value);
     ret |=  img_write_register(0x009,camera_exposer_value);
     ret |=  img_write_register(0x00A,R_0A_value);
-    ret |=  img_write_register(0x010,R_10_value);
-    ret |=  img_write_register(0x011,R_11_value);
-    ret |=  img_write_register(0x012,R_12_value);
-    usleep(100);
-    ret |=  img_write_register(0x010,R_1X_value);
-    usleep(100);
+
     ret |=  img_write_register(0x020,R_20_value);
     ret |=  img_write_register(0x022,R_22_value);
     ret |=  img_write_register(0x023,R_23_value);
@@ -739,6 +789,12 @@ void camera_hdmi_config() {
     ret |=  img_write_register(0x063,R_63_value);
     ret |=  img_write_register(0x064,R_64_value);
     ret |=  img_write_register(0x049,R_49_value);
+    ret |=  img_write_register(0x010,R_10_value);
+    ret |=  img_write_register(0x011,R_11_value);
+    ret |=  img_write_register(0x012,R_12_value);
+    usleep(100);
+    ret |=  img_write_register(0x010,R_1X_value);
+    usleep(100);
     ret |=  img_write_register(0x098,R_98_value);
     ret |=  img_write_register(0x0A0,R_A0_value);
     ret |=  img_write_register(0x0A1,R_A1_value);

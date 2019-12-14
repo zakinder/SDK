@@ -120,7 +120,7 @@ if(value==2)
 	// 3 - Sharp Video
 	// 4 - normal Video
 	videoFeatureSelect(0x0004);
-	d5mtestpattern(0x0004);
+	d5mwTestpattern(0x0004);
 	xil_printf("normal Video\n\r");
 }
 if(value==3)
@@ -222,9 +222,49 @@ int DO_HTTP_POST(struct tcp_pcb *pcb, char *req, int rlen)
     int n;
     int len;
     char *p;
+    char buffer[5] = {0};
     static char *txPixel;
     SWITCH_STATE = GET_SWITCH_STATE();
     if(SWITCH_STATE==0)
+    {
+            if(CMD_PL_PS_STREAMER_ASSERT(req+6))
+            {
+                y++;
+    		    if(address > 0x23F47FF)//eof   end of frame if(y > SCREEN_HEIGHT_VERTICAL*SCREEN_WIDTH_HORIZONTAL*2)
+    		    {
+    		    	y = 0;//reset the line
+    		    	address = 0x2008700;//sof
+    		    	xil_printf("=======================================\n\r");
+    		    }
+                x++;
+                if(x == 241)//value sync for zoom by [1920 /8 = 240]
+                {// skiped line address jump 0x7800
+                   address = address + 0x7800;//skip lines by [1920 * 16=30720(0x7800)]
+                   x=0;
+                }else{
+                    address = address + 0x10;//2-bytes read per address location 16 bits 2 bytes increment
+                }
+                
+                if(x < 239){
+                //char buffer[5] = {0};
+                //pvideo.pixelvalue = (Xil_In16(address) & 0xffff);//[mpeg444Y 8 bits only] [1byte read in given address][instead Xil_In16 for 2 bytes]
+                snprintf(buffer,sizeof(buffer),"%d",(Xil_In16(address)& 0xffff));
+                }
+                
+
+            
+      
+                printf  ("%s\n", buffer);
+                //dataPack(pvideo.pixelvalue & 0x00ff);
+                
+                char *json_response = buffer;//pointer of buff_json_response
+                len = GENERATE_HTTP_HEADER(buf, "js", strlen(buffer));//header infront of buff_json_response
+                p = buf + len;//add buf and buff_json_response lenght size to pointer p char
+                strcpy(p, json_response);//copy string to pointer p
+                len += strlen(json_response);
+            }
+    }
+    if(SWITCH_STATE==1)
     {
             if(CMD_PL_PS_STREAMER_ASSERT(req+6))
             {
@@ -246,8 +286,11 @@ int DO_HTTP_POST(struct tcp_pcb *pcb, char *req, int rlen)
                 if(x < 239){
                     pvideo.pixelvalue = (Xil_In16(address) & 0xffff);//[mpeg444Y 8 bits only] [1byte read in given address][instead Xil_In16 for 2 bytes]
                 }
+                
                 //duals
-                	dataPack(pvideo.pixelvalue & 0x00ff);
+                
+                
+                dataPack(pvideo.pixelvalue & 0x00ff);
                 char *json_response = regPack;//pointer of buff_json_response
                 len = GENERATE_HTTP_HEADER(buf, "js", strlen(regPack));//header infront of buff_json_response
                 p = buf + len;//add buf and buff_json_response lenght size to pointer p char

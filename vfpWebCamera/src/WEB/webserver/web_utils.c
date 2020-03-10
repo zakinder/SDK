@@ -1,8 +1,11 @@
+#include <mfs_config.h>
 #include <stdio.h>
 #include <string.h>
+#include <xil_printf.h>
+#include <xilmfs.h>
+
 #include "webserver.h"
-#include "mfs_config.h"
-#include "xil_printf.h"
+
 int IS_CMD_LED(char *buf)
 {
     buf += 6;
@@ -336,13 +339,13 @@ void DUMP_PAYLOAD(char *p, int len)
 }
 int platform_init_fs()
 {
-	mfs_init_fs(MFS_NUMBYTES, (char *)(MFS_BASE_ADDRESS+4), MFS_INIT_TYPE);
-	if (mfs_exists_file("index.html") == 0) {
-		xil_printf("%s: ERROR: unable to locate index.html in MFS\r\n", __FUNCTION__);
-		xil_printf("One of your applications requires a Memory File System to be loaded.\r\n");
+    mfs_init_fs(MFS_NUMBYTES, (char *)(MFS_BASE_ADDRESS+4), MFS_INIT_TYPE);
+    if (mfs_exists_file("index.html") == 0) {
+        xil_printf("%s: ERROR: unable to locate index.html in MFS\r\n", __FUNCTION__);
+        xil_printf("One of your applications requires a Memory File System to be loaded.\r\n");
                 xil_printf("Please check if MFS has been loaded, "
-				"and it has index.html file in root directory\r\n");
-		return -1;
-	}
-	return 0;
+                "and it has index.html file in root directory\r\n");
+        return -1;
+    }
+    return 0;
 }

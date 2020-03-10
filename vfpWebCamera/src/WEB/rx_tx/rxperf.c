@@ -5,7 +5,7 @@
 #ifdef __arm__
 #include "xil_printf.h"
 #endif
-static unsigned rxperf_port = 5001;	
+static unsigned rxperf_port = 5001;    
 static unsigned rxperf_server_running = 0;
 int
 transfer_rxperf_data() {
@@ -36,19 +36,19 @@ start_rxperf_application()
     err_t err;
     pcb = tcp_new();
     if (!pcb) {
-    	xil_printf("rxperf: Error creating PCB. Out of Memory\r\n");
-    	return -1;
+        xil_printf("rxperf: Error creating PCB. Out of Memory\r\n");
+        return -1;
     }
     err = tcp_bind(pcb, IP_ADDR_ANY, rxperf_port);
     if (err != ERR_OK) {
-    	xil_printf("rxperf: Unable to bind to port %d: err = %d\r\n", rxperf_port, err);
-    	return -2;
+        xil_printf("rxperf: Unable to bind to port %d: err = %d\r\n", rxperf_port, err);
+        return -2;
     }
     tcp_arg(pcb, NULL);
     pcb = tcp_listen(pcb);
     if (!pcb) {
-    	xil_printf("rxperf: Out of memory while tcp_listen\r\n");
-    	return -3;
+        xil_printf("rxperf: Out of memory while tcp_listen\r\n");
+        return -3;
     }
     tcp_accept(pcb, rxperf_accept_callback);
     rxperf_server_running = 1;

@@ -1,6 +1,8 @@
 #ifndef __VIDEO_RESOLUTION_H__
 #define __VIDEO_RESOLUTION_H__
-#include "xbasic_types.h"
+
+#include <xbasic_types.h>
+
 struct struct_vres_timing_t
 {
     char *pName;

@@ -1,7 +1,6 @@
-// LAST TESTED : 09/08/2019
+// LAST TESTED : 12/27/2019
 #ifndef __SYSTEM_CONFIG_DEFINES_H__
 #define __SYSTEM_CONFIG_DEFINES_H__
-#include <xaxivdma.h>
 #define ONESECOND    0x13D92D3F
 #define ONE_SECOND 3250000000
 #define READ_WRITE_MUL_FACTOR 0x10
@@ -11,7 +10,7 @@
 #define D5M_BASE XPAR_PS_VIDEO_D5M_VFP_VFPCONFIG_BASEADDR
 /*****************************************************************************************************************/
 #define D5M_mWriteReg(BaseAddress, RegOffset, Data) \
-  	Xil_Out32((BaseAddress) + (RegOffset), (u32)(Data))
+      Xil_Out32((BaseAddress) + (RegOffset), (u32)(Data))
 #define D5M_mReadReg(BaseAddress, RegOffset) \
     Xil_In32((BaseAddress) + (RegOffset))
 /*****************************************************************************************************************/
@@ -107,7 +106,6 @@ YCBCR
 #define kCoefVals_kCoeffYcbcr_k8   0xFE90//-- -0.368
 #define kCoefVals_kCoeffYcbcr_k9   0xFFB9//-- -0.071
 #define kCoefVals_kCoeffYcbcr_kSet 1
-
 /****************************************************************
 CGAIN_1
 *****************************************************************/
@@ -454,15 +452,11 @@ UNSED KERNEL
 #define menuCheck               19
 #define kernalCoef              0
 /*****************************************************************************************************************/
-
-
-
 #define kernalconfig            0x6769666E
 #define clear                   0x10ECC0
 #define mainmenu                0x4773053D
 #define uart_0_baseaddr         0xe0000000
 #define uart_1_baseaddr         0xe0001000
-
 #define timex                   0x137C66
 #define display1                0x429F579F
 #define display2                0x429F57A0
@@ -638,6 +632,5 @@ UNSED KERNEL
 #define sdcard                  0xC06994
 #define wsd                     0x335E
 #define rsd                     0x316A
-
 /*****************************************************************************************************************/
 #endif // __SYSTEM_CONFIG_DEFINES_H__

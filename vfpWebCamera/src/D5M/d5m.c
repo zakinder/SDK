@@ -1,4 +1,4 @@
-// LAST TESTED : 11/29/2019
+// LAST TESTED : 3/10/2020
 
 #include "I2C_D5M/i2c_d5m.h"
 #include "VIDEO_CHANNEL/channel.h"
@@ -7,20 +7,18 @@
 //Set and write all filters kernal coefficients and system default configurable registers
 void d5m()
 {
-	//Write d5m camera config values on i2c bus
-	camera_hdmi_config();
-	//Set All Filters Kernal Coefficients
-    KernelInit();
-	//Set vdma and hdmi default configurable registers
-    vdmaHdmiConfig();
-	//Set RgbLevel Registers
-    vfpRgbLevelConfig();
-	//Set System Default Configurable Registers
-	d5mInit();
-	//Write System Configurable Registers to Slave devices
-	WriteToVfp();
+    //Write d5m camera config values on i2c bus
+    camera_hdmi_config();
+    //Set All Filters Kernal Coefficients
+    kernel_init();
+    //Set vdma and hdmi default configurable registers
+    vdma_hdmi_config();
+    //Set RgbLevel Registers
+    vfp_rgb_level_config();
+    //Set System Default Configurable Registers
+    d5m_init();
+    //Write System Configurable Registers to Slave devices
+    write_to_vfp();
     //Initialize Vdma to hdmi
-	InitVdmaHdmi();
-
-
+    init_vdma_hdmi();
 }

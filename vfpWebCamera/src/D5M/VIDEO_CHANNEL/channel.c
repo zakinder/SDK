@@ -1,4 +1,4 @@
-// LAST TESTED : 09/08/2019
+// LAST TESTED : 12/27/2019
 #include "channel.h"
 #include <sleep.h>
 #include <stdio.h>
@@ -10,7 +10,7 @@
 #include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
 #include "../SYSTEM_CONFIG_HEADER/system_config_header.h"
 #include "../VIDEO_FILTERS/filters.h"
-void vdmaHdmiConfig(){
+void vdma_hdmi_config(){
     //DEFAULT CONFIGURABLE
     pvideo.uBaseAddr_IIC_HdmiOut        = XPAR_HDMI_OUTPUT_HDMI_IIC_BASEADDR;
     pvideo.uDeviceId_VTC_HdmioGenerator = XPAR_VIDEO_PIPELINE_TIMMING_CONTROLELR_DEVICE_ID;
@@ -21,7 +21,7 @@ void vdmaHdmiConfig(){
     pvideo.hdmio_width_Stride           = SCREEN_WIDTH_HORIZONTAL*2;
     pvideo.hdmio_height                 = SCREEN_HEIGHT_VERTICAL;
 }
-void vfpRgbLevelConfig(){
+void vfp_rgb_level_config(){
     //DEFAULT CONFIGURABLE
     pvideo.fRgbCoordRL       = 0x001E;//1E=30
     pvideo.fRgbCoordRH       = 0x00E6;//E6=230
@@ -30,7 +30,7 @@ void vfpRgbLevelConfig(){
     pvideo.fRgbCoordBL       = 0x001E;//1E=30
     pvideo.fRgbCoordBH       = 0x0096;//96=150
 }
-void d5mInit(){
+void d5m_init(){
     pvideo.time = (((0x0000ff & D5M_mReadReg(D5M_BASE,r_hour_reg_62))<<16)|((D5M_mReadReg(D5M_BASE,r_min_reg_61) & 0x0000ff)<<8)|(0x0000ff & D5M_mReadReg(D5M_BASE,r_sec_reg_60)));
     pvideo.sec               = D5M_mReadReg(D5M_BASE,r_sec_reg_60);
     pvideo.min               = D5M_mReadReg(D5M_BASE,r_min_reg_61);
@@ -131,11 +131,11 @@ void d5mInit(){
     pCg3.K9     = 0x05DC;//--  1375  =  1.500
     pCg3.Kc     = 0x0002;
     }
-void InitVdmaHdmi(){
+void init_vdma_hdmi(){
     d5m_vdma_hdmi(&pvideo);
     VdmaInit();
 }
-void WriteToVfp(){
+void write_to_vfp(){
     selected_channel();
     pointInterestFixed();
     ycbcr_Enable();
@@ -151,40 +151,31 @@ void d5mInitCall(){
     //d5mtestpattern(0x0004);
     //exposerCompansate();
 }
-u16 rColorFilterA11()
-{
+u16 rColorFilterA11(){
     return D5M_mReadReg(D5M_BASE,w_a11fl_reg_21);
 }
-u16 rColorFilterA12()
-{
+u16 rColorFilterA12(){
     return D5M_mReadReg(D5M_BASE,w_a12fl_reg_22);
 }
-u16 rColorFilterA13()
-{
+u16 rColorFilterA13(){
     return D5M_mReadReg(D5M_BASE,w_a13fl_reg_23);
 }
-u16 rColorFilterA21()
-{
+u16 rColorFilterA21(){
     return D5M_mReadReg(D5M_BASE,w_a21fl_reg_24);
 }
-u16 rColorFilterA22()
-{
+u16 rColorFilterA22(){
     return D5M_mReadReg(D5M_BASE,w_a22fl_reg_25);
 }
-u16 rColorFilterA23()
-{
+u16 rColorFilterA23(){
     return D5M_mReadReg(D5M_BASE,w_a23fl_reg_26);
 }
-u16 rColorFilterA31()
-{
+u16 rColorFilterA31(){
     return D5M_mReadReg(D5M_BASE,w_a31fl_reg_27);
 }
-u16 rColorFilterA32()
-{
+u16 rColorFilterA32(){
     return D5M_mReadReg(D5M_BASE,w_a32fl_reg_28);
 }
-u16 rColorFilterA33()
-{
+u16 rColorFilterA33(){
     return D5M_mReadReg(D5M_BASE,w_a33fl_reg_29);
 }
 void d5mInitPrint(){
@@ -202,7 +193,7 @@ void d5mInitPrint(){
     printf("w_kSet_reg_17\n\r");
     printf("%d\n\r",(unsigned) D5M_mReadReg(D5M_BASE,w_kSet_reg_17));
 }
-void edgeThresholdVal(u16 thresholdValue)
+void edge_threshold_val(u16 thresholdValue)
 {
     D5M_mWriteReg(D5M_BASE,w_threshold_reg_4,thresholdValue);
 }
@@ -212,55 +203,55 @@ void videoFeatureSelect(u16 videoType)
 }
 void videokCoefValsUpdate(u16 testValues,int filterNumber)
 {
-	//------------------------------------------------------------------------------
-	unsigned int uK1 = 0;
-	unsigned int uK2 = 0;
-	unsigned int uK3 = 0;
-	unsigned int uK4 = 0;
-	unsigned int uK5 = 0;
-	unsigned int uK6 = 0;
-	unsigned int uK7 = 0;
-	unsigned int uK8 = 0;
-	unsigned int uK9 = 0;
-	int K1 = 0;
-	int K2 = 0;
-	int K3 = 0;
-	int K4 = 0;
-	int K5 = 0;
-	int K6 = 0;
-	int K7 = 0;
-	int K8 = 0;
-	int K9 = 0;
-	//------------------------------------------------------------------------------
-	printf("before\n");
-	printf("%d\n",pCg1.K1);
-	printf("%d\n",pCg1.K2);
-	printf("%d\n",pCg1.K3);
-	printf("%d\n",pCg1.K4);
-	printf("%d\n",pCg1.K5);
-	printf("%d\n",pCg1.K6);
-	printf("%d\n",pCg1.K7);
-	printf("%d\n",pCg1.K8);
-	printf("%d\n",pCg1.K9);
-	pCg1.K1 = pCg1.K1 + testValues - pCg1.K2 - pCg1.K3;
-	pCg1.K2 = pCg1.K2 - testValues;
-	pCg1.K3 = pCg1.K3 - testValues;
-	pCg1.K4 = pCg1.K4 - testValues;
-	pCg1.K5 = pCg1.K5 + testValues - pCg1.K4 - pCg1.K6;
-	pCg1.K6 = pCg1.K6 - testValues;
-	pCg1.K7 = pCg1.K7 - testValues;
-	pCg1.K8 = pCg1.K8 - testValues;
-	pCg1.K9 = pCg1.K9 + testValues - pCg1.K7 - pCg1.K8;
-	printf("after\n");
-	printf("%d\n",pCg1.K1);
-	printf("%d\n",~pCg1.K2);
-	printf("%d\n",~pCg1.K3);
-	printf("%d\n",~pCg1.K4);
-	printf("%d\n",pCg1.K5);
-	printf("%d\n",~pCg1.K6);
-	printf("%d\n",~pCg1.K7);
-	printf("%d\n",~pCg1.K8);
-	printf("%d\n",pCg1.K9);
+    //------------------------------------------------------------------------------
+    unsigned int uK1 = 0;
+    unsigned int uK2 = 0;
+    unsigned int uK3 = 0;
+    unsigned int uK4 = 0;
+    unsigned int uK5 = 0;
+    unsigned int uK6 = 0;
+    unsigned int uK7 = 0;
+    unsigned int uK8 = 0;
+    unsigned int uK9 = 0;
+    int K1 = 0;
+    int K2 = 0;
+    int K3 = 0;
+    int K4 = 0;
+    int K5 = 0;
+    int K6 = 0;
+    int K7 = 0;
+    int K8 = 0;
+    int K9 = 0;
+    //------------------------------------------------------------------------------
+    printf("before\n");
+    printf("%d\n",pCg1.K1);
+    printf("%d\n",pCg1.K2);
+    printf("%d\n",pCg1.K3);
+    printf("%d\n",pCg1.K4);
+    printf("%d\n",pCg1.K5);
+    printf("%d\n",pCg1.K6);
+    printf("%d\n",pCg1.K7);
+    printf("%d\n",pCg1.K8);
+    printf("%d\n",pCg1.K9);
+    pCg1.K1 = pCg1.K1 + testValues - pCg1.K2 - pCg1.K3;
+    pCg1.K2 = pCg1.K2 - testValues;
+    pCg1.K3 = pCg1.K3 - testValues;
+    pCg1.K4 = pCg1.K4 - testValues;
+    pCg1.K5 = pCg1.K5 + testValues - pCg1.K4 - pCg1.K6;
+    pCg1.K6 = pCg1.K6 - testValues;
+    pCg1.K7 = pCg1.K7 - testValues;
+    pCg1.K8 = pCg1.K8 - testValues;
+    pCg1.K9 = pCg1.K9 + testValues - pCg1.K7 - pCg1.K8;
+    printf("after\n");
+    printf("%d\n",pCg1.K1);
+    printf("%d\n",~pCg1.K2);
+    printf("%d\n",~pCg1.K3);
+    printf("%d\n",~pCg1.K4);
+    printf("%d\n",pCg1.K5);
+    printf("%d\n",~pCg1.K6);
+    printf("%d\n",~pCg1.K7);
+    printf("%d\n",~pCg1.K8);
+    printf("%d\n",pCg1.K9);
     uK1 = (pCg1.K1 + testValues);
     uK2 = (~(pCg1.K2-testValues))&0x00FF;
     uK3 = (~(pCg1.K3-testValues))&0x00FF;
@@ -401,7 +392,6 @@ void lThSelect(u16 lThSelectValue)
 {
     D5M_mWriteReg(D5M_BASE,w_lumTh_reg_56,lThSelectValue);
 }
-
 void rawRgbSelect(u16 rawRgbSelectValue)
 {
     D5M_mWriteReg(D5M_BASE,w_abusselect_reg_3,rawRgbSelectValue);
@@ -421,7 +411,7 @@ void fifoStatus()
     printf("pvideo.fifoFullh %d\n\r",(unsigned) (pvideo.fifoFullh));
     printf("pvideo.cpuGridCont %d\n\r",(unsigned) (pvideo.cpuGridCont));
 }
-void readGDataContinueMode()
+void read_gdata_continue_mode()
 {
     D5M_mWriteReg(D5M_BASE,w_cpuwgridlock_reg_34,1);
     pvideo.fifoFullh   = D5M_mReadReg(D5M_BASE,r_fifofullh_reg_39);
@@ -536,7 +526,7 @@ void selected_channel()
     D5M_mWriteReg(D5M_BASE,w_bh_reg_54,pStream.fRgbCoordBL);//cord
     D5M_mWriteReg(D5M_BASE,w_bl_reg_55,pStream.fRgbCoordBH);//cord
     D5M_mWriteReg(D5M_BASE,w_abusselect_reg_3,pStream.fDbusSelect);
-    edgeThresholdVal(pStream.fThreshold);
+    edge_threshold_val(pStream.fThreshold);
     //prewittWrite();
 }
 void colorDetectRange(u16 fRgbCoordRL,u16 fRgbCoordRH,u16 fRgbCoordGL,u16 fRgbCoordGH,u16 fRgbCoordBL,u16 fRgbCoordBH)

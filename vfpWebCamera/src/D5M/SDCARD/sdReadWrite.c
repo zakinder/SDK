@@ -1,16 +1,15 @@
 #include <ff.h>
 #include <integer.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <xbasic_types.h>
 #include <xil_io.h>
-#include <xil_printf.h>
+#include <xil_types.h>
 #include <xstatus.h>
+
 #include "../SYSTEM_CONFIG_HEADER/system_config_header.h"
 #include "../UART/uartio.h"
 #include "../VIDEO_CHANNEL/channel.h"
+
 #define MAX_STRING_LENGTH 80
 #define PIXEL_LENGTH 7
 static FIL fil;
@@ -34,7 +33,7 @@ int j;
 int pix;
 UINT bw; // bytes written
 TCHAR *Path = "0:/";
-int WrFrData()
+int wr_fr_data1()
 {
     adrSof  = 0x2008700;//skip 1st line
     adrEof  = 0x23F47FF;
@@ -94,7 +93,7 @@ int WrFrData()
     if (Res != FR_OK) {return XST_FAILURE;}
     return XST_SUCCESS;
 }
-int Wr_Data_Sd()
+int wr_data_sd() 
 {
     adrSof  = 0x2008700;//skip 1st line
     nAddre  = 0x2;
@@ -130,7 +129,7 @@ int Wr_Data_Sd()
     if (Res != FR_OK) {return XST_FAILURE;}
     return XST_SUCCESS;
 }
-int Rd_WR_Data_Sd()
+int rd_wr_data_sd()
 {
     adrSof  = 0x2008700;//skip 1st line
     nAddre  = 0x2;
@@ -518,7 +517,7 @@ int writeRawFrameData(int height,int width)
     if (Res != FR_OK) {return XST_FAILURE;}
     return XST_SUCCESS;
 }
-int Write_HD_Data_Sd()
+int write_hd_data_sd()
 {
     adrSof  = 0x2008700;//skip 1st line
     nAddre  = 0x02;
@@ -528,12 +527,10 @@ int Write_HD_Data_Sd()
     int offset;
     int width;
     int height;
-
     unsigned char *response;
     unsigned char buff[PIXEL_LENGTH] = { 0 };
     char iFilName[MAX_STRING_LENGTH] = "RGB.BMP";
     unsigned char *buffer;
-
     SD_File  = (char *)iFilName;
     Res = f_mount(&fatfs,Path,0);
     if (Res != FR_OK) {return XST_FAILURE;}

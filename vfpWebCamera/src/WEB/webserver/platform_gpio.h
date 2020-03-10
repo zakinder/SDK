@@ -2,7 +2,8 @@
 #define __PLATFORM_GPIO_H_
 
 #include <xbasic_types.h>
-typedef unsigned long	un32bits;//Unsign 32 bits
+
+typedef unsigned long    un32bits;//Unsign 32 bits
 void platform_init_gpios();
 int TOGGLE_LEDS();
 unsigned int GET_SWITCH_STATE();

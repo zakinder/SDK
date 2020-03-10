@@ -1,8 +1,8 @@
-// LAST TESTED : 09/01/2019
+// LAST TESTED : 12/27/2019
 #ifndef __UART_H__
 #define __UART_H__
 
-#include <xil_types.h>
+#include <xbasic_types.h>
 
 char uart_per_char_read(u32 uart_address);
 char* char_to_uart(char auserinput[]);
@@ -17,10 +17,10 @@ u32 enter_value_or_quit(char s[],u32 current_state);
 u32 enter_or_quit(char s[],u32 current_state);
 void menu_print_prompt();
 u32 uartcmd(u32 argA,u32 argB);
-void keyArrow1Select();
-void keyArrow2Select();
-void keyArrow3Select();
-void d5mgainSelect();
+void key_arrow_1_select();
+void key_arrow_2_select();
+void key_arrow_3_select();
+void d5m_gain_select();
 void cmds_menu();
 void master_menu();
 void menu_cls();

@@ -1,4 +1,4 @@
-// LAST TESTED : 09/01/2019
+// LAST TESTED : 12/27/2019
 #ifndef __CHANNEL_H__
 #define __CHANNEL_H__
 #include <xil_types.h>
@@ -39,10 +39,8 @@ void prewittEnable();
 void computeBrightness();
 void pRbrightness();
 void selected_channel();
-void edgeThresholdVal(u16 thresholdValue);
+void edge_threshold_val(u16 thresholdValue);
 void videoFeatureSelect(u16 videoType);
-
-
 void WrDataSd();
 void edgeType(u16 edgeTypeValue);
 void edgeColor(u16 edgeColorVal);
@@ -56,15 +54,15 @@ void framefifoMode(u16 fifoMode);
 void point_Interest(u16 videoType);
 void ReadDataByte(u16 Value);
 void fifoStatus();
-void readGDataContinueMode();
+void read_gdata_continue_mode();
 void readGDataStopMode();
 void pointInterestFixed();
 void framefifoFixed();
-void vdmaHdmiConfig();
-void vfpRgbLevelConfig();
-void InitVdmaHdmi();
-void WriteToVfp();
-void d5mInit();
+void vdma_hdmi_config();
+void vfp_rgb_level_config();
+void init_vdma_hdmi();
+void write_to_vfp();
+void d5m_init();
 void d5mInitCall();
 void d5mInitPrint();
 void ycbcr_Disable();

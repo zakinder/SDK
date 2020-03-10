@@ -1,16 +1,20 @@
-// LAST TESTED : 05/03/2019
+// LAST TESTED : 12/27/2019
+
 #include "hdmi_display.h"
-#include "../MENU_CALLS/menu_calls.h"
+
 #include <sleep.h>
+#include <xbasic_types.h>
 #include <xil_cache.h>
+#include <xil_io.h>
 #include <xil_printf.h>
-#include <xil_types.h>
-#include <xparameters.h>
-#include "../SYSTEM_CONFIG_HEADER/system_config_header.h"
+#include <xstatus.h>
+
+#include "../HDMI_IIC/zed_iic.h"
 #include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
 #include "../UART/uartio.h"
 #include "../VIDEO_FRAME_BUFFER/video_frame_buffer.h"
 #include "../VIDEO_GENERATOR/video_generator.h"
+
 #define VDMA_BASEADDR XPAR_AXIVDMA_0_BASEADDR
 u32 srcBufferx1 = VIDEO_BASEADDR0;
 u32 srcBufferx2 = VIDEO_BASEADDR1;
@@ -146,7 +150,7 @@ void colorBars_vdma_hdmi(hdmi_display_start *pvideo)
    u32 menu_enable  = 0;
    while(menu_enable != 0x20)
   {
-	   menu_enable = uart_prompt_io();
+       menu_enable = uart_prompt_io();
    if ( iterations > 0 )
    {
       xil_printf( "\n\rPress ENTER to re-start ...\n\r" );
@@ -293,7 +297,7 @@ void manualVdmaConfig(hdmi_display_start *pvideo)
    Xil_Out32((VDMA_BASEADDR + 0x000), 0x00000003);                 // enable circular mode
    Xil_Out32((VDMA_BASEADDR + 0x050), pvideo->hdmio_height);       // Hight
    Xil_DCacheDisable();
-   printf("Compute Brightness[%i]\n",(unsigned) computeBrightness());
+
 }
 void buffer_vdma_hdmi(hdmi_display_start *pvideo)
 {
@@ -318,7 +322,7 @@ void buffer_vdma_hdmi(hdmi_display_start *pvideo)
     u32 menu_enable  = 0;
     while(menu_enable != 0x20)
    {
- 	   menu_enable = uart_prompt_io();
+        menu_enable = uart_prompt_io();
       //buffer();
    }
 }

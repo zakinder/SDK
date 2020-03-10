@@ -1,10 +1,13 @@
-// LAST TESTED : 09/01/2019
+// LAST TESTED : 12/27/2019
 #ifndef __SYSTEM_CONFIG_HEADER_H__
 #define __SYSTEM_CONFIG_HEADER_H__
+
 #include <xaxivdma.h>
 #include <xbasic_types.h>
 #include <xvtc.h>
+
 #include "../HDMI_IIC/zed_iic.h"
+
 typedef unsigned char un8bits;//Unsign 8 bits
 typedef char sn8bits;//Sign 8 bits
 typedef unsigned short un16bits;//Unsign 16 bits
@@ -35,7 +38,6 @@ struct videoStreamStruct
 };
 typedef struct videoStreamStruct videoStreamInit;
 videoStreamInit pStream;
-
 struct kernelStruct
 {
    Xuint16 K1;
@@ -49,16 +51,13 @@ struct kernelStruct
    Xuint16 K9;
    Xuint16 Kc;
 };
-
 typedef struct kernelStruct kernelVal;
-
 kernelVal pprewitt;
 kernelVal psobel;
 kernelVal pcolor;
 kernelVal pCg1;
 kernelVal pCg2;
 kernelVal pCg3;
-
 struct struct_hdmi_display_start
 {
    Xuint32 uBaseAddr_IIC_HdmiOut;

@@ -1,7 +1,11 @@
-// LAST TESTED : 12/16/2018
+// LAST TESTED : 12/27/2019
+
 #include "video_resolution.h"
-#include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
+
 #include <xil_printf.h>
+
+#include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
+
 vres_timing_t vres_resolutions[NUM_VIDEO_RESOLUTIONS] = {
    // name     vav,  vfp,  vsw,  vbp,  vsp,  hav,  hfp,  hsw,  hbp,  hsp
    { "VGA",    480,   10,    2,   33,    0,  640,   16,   96,   48,    0 }, // VIDEO_RESOLUTION_VGA

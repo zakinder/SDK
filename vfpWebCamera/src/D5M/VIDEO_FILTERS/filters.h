@@ -1,6 +1,8 @@
 #ifndef SRC_D5M_VIDEO_FILTERS_FILTERS_H_
 #define SRC_D5M_VIDEO_FILTERS_FILTERS_H_
+
 #include <xbasic_types.h>
+
 /****************************************************************
 KERNELS COEF STRUCT
 *****************************************************************/
@@ -18,7 +20,6 @@ struct kStruct
    Xuint16 Kc;
    Xuint16 Vid;
 };
-
 typedef struct kStruct Coef;
 Coef pYcCf;
 Coef pCgCf;
@@ -47,7 +48,6 @@ struct kInStruct
 };
 typedef struct kInStruct InCoef;
 InCoef pInCoef;
-
 struct KeypressStruct
 {
    Xuint16 ValueDown;
@@ -58,15 +58,14 @@ struct KeypressStruct
 };
 typedef struct KeypressStruct KeyVal;
 KeyVal pKey;
-
 void CgCoef(Coef *pCf);
 void CgainInit();
 void pKeyInit();
 void CgainConfig(u16 kValues,Coef *pCgCf);
 void KeyPrValue();
-void KernelConfig(Coef *pCf);
+void kernel_config(Coef *pCf);
 void keyCgainConfigSelect();
-void KernelInit();
+void kernel_init();
 void printKId();
 #define k0                     0x42E
 #define k1                     0x42F

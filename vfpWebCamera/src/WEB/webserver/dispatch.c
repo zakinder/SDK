@@ -1,3 +1,5 @@
+#include <xil_printf.h>
+
 #include "webserver.h"
 
 void print_echo_app_header();
@@ -37,9 +39,9 @@ void print_headers()
     if (INCLUDE_WEB_SERVER)
         print_web_app_header();
     if (INCLUDE_TXUPERF_CLIENT)
-    	print_utxperf_app_header();
+        print_utxperf_app_header();
     if (INCLUDE_RXUPERF_CLIENT)
-    	print_urxperf_app_header();
+        print_urxperf_app_header();
     xil_printf("\r\n");
 }
 void start_applications()
@@ -55,13 +57,13 @@ void start_applications()
     if (INCLUDE_WEB_SERVER)
         start_web_application();
     if (INCLUDE_TXUPERF_CLIENT)
-    	start_utxperf_application();
+        start_utxperf_application();
     if (INCLUDE_RXUPERF_CLIENT)
-    	start_urxperf_application();
+        start_urxperf_application();
 }
 void transfer_data()
 {
-	if (INCLUDE_ECHO_SERVER)
+    if (INCLUDE_ECHO_SERVER)
         transfer_echo_data();
     if (INCLUDE_RXPERF_SERVER)
         transfer_rxperf_data();
@@ -72,7 +74,7 @@ void transfer_data()
     if (INCLUDE_WEB_SERVER)
         transfer_web_data();
     if (INCLUDE_TXUPERF_CLIENT)
-    	transfer_utxperf_data();
+        transfer_utxperf_data();
     if (INCLUDE_RXUPERF_CLIENT)
-    	transfer_urxperf_data();
+        transfer_urxperf_data();
 }

@@ -1,7 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-#include "lwip/err.h"
-#include "lwip/tcp.h"
+#include <lwip/err.h>
+#include <lwip/ip_addr.h>
+#include <lwip/pbuf.h>
+#include <lwip/tcp.h>
+#include <stddef.h>
+
 #ifndef __PPC__
 #include "xil_printf.h"
 #endif

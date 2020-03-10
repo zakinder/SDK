@@ -1,7 +1,8 @@
 #ifndef __ZED_IIC_H__
 #define __ZED_IIC_H__
-#include <stdio.h>
-#include "xbasic_types.h"
+
+#include <xbasic_types.h>
+
 #define ZED_IIC_CONTEXT_BUFFER_SIZE 32
 struct struct_zed_iic_t
 {

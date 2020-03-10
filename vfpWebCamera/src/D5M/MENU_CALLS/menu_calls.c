@@ -1,13 +1,11 @@
-// LAST TESTED : 09/08/2019
 
+// LAST TESTED : 3/10/2020
 #include "menu_calls.h"
-
 #include <stdio.h>
 #include <xbasic_types.h>
 #include <xil_io.h>
 #include <xil_printf.h>
 #include <xstatus.h>
-
 #include "../HDMI_DISPLAY/hdmi_display.h"
 #include "../I2C_D5M/i2c_d5m.h"
 #include "../SDCARD/sdReadWrite.h"
@@ -16,11 +14,9 @@
 #include "../UART/uartio.h"
 #include "../VIDEO_CHANNEL/channel.h"
 #include "../VIDEO_FILTERS/filters.h"
-
 d5m_rreg d5m_rreg_ptr;
-
-void menu_calls(ON_OFF) {
-    int menu_calls_enable = ON_OFF;
+void menu_calls(int ENABLE_MENU) {
+    int menu_calls_enable = ENABLE_MENU;
     unsigned int uart_io;
     u32 current_state = mainmenu;
     int ret;
@@ -122,38 +118,36 @@ void menu_calls(ON_OFF) {
             /*****************************************************************************************************************/
         case sdcard:
             /*****************************************************************************************************************/
-            xil_printf("WrFrData \r\n");
-        	Status = WrFrData();
+            xil_printf("wr_fr_data \r\n");
+            Status = write_image_frame();
             if (Status != XST_SUCCESS) {
-            	xil_printf("READ RAW DATA failed \r\n");
+                xil_printf("READ RAW DATA failed \r\n");
             }
             cmd_status_substate = enter_value_or_quit("sdcard",sdcard);current_state = cmd_status_substate;break;
         case wsd:
             /*****************************************************************************************************************/
-            xil_printf("WrFrData \r\n");
-            
-        	Status = Rd_WR_Data_Sd();
+            xil_printf("wr_fr_data \r\n");
+            Status = wr_fr_data();
             if (Status != XST_SUCCESS) {
-            	xil_printf("READ RAW DATA failed \r\n");
+                xil_printf("READ RAW DATA failed \r\n");
             }
             cmd_status_substate = enter_value_or_quit("wsd",wsd);current_state = cmd_status_substate;break;
         case rsd:
             /*****************************************************************************************************************/
-            xil_printf("WrFrData \r\n");
-        	Status = Rd_Data_Sd();
-            
+            xil_printf("wr_fr_data \r\n");
+            Status = Rd_Data_Sd();
             if (Status != XST_SUCCESS) {
-            	xil_printf("READ RAW DATA failed \r\n");
+                xil_printf("READ RAW DATA failed \r\n");
             }
             cmd_status_substate = enter_value_or_quit("rsd",rsd);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case wsdcard:
             /*****************************************************************************************************************/
             xil_printf("writeData \r\n");
-            Write_HD_Data_Sd();
-//        	printf("2nd Line chRegister Line \r\n");
+            write_hd_data_sd();
+//            printf("2nd Line chRegister Line \r\n");
 //            printf("4: %s \r\n",chRegister);
-//        	menu_print_prompt();
+//            menu_print_prompt();
 //
 //            char_to_uart(charReg);
 //
@@ -163,320 +157,52 @@ void menu_calls(ON_OFF) {
         case rsdcard:
             /*****************************************************************************************************************/
 //            printf("1: %s \r\n",charReg);
-//        	menu_print_prompt();
+//            menu_print_prompt();
 //            char charRegister[8] = { 0 };
 //            char_to_uart(charRegister);
 //            printf("2: %s \r\n",charRegister);
 //            printf("2nd Line \r\n");
-//        	menu_print_prompt();
+//            menu_print_prompt();
 //
 //            char_to_uart(chRegister);
 //            printf("3: %s \r\n",chRegister);
             //charRegister = char_to_uart(b);
-        	//printf("charRegister: %c \n",charRegister);
+            //printf("charRegister: %c \n",charRegister);
             printf("writeRawFrameData Enter height\n");
             menu_print_prompt();
             temp1Register = uart_prompt_io();
             printf("Enter width\n");
             menu_print_prompt();
             temp2Register = uart_prompt_io();
-        	Status = writeRawFrameData(temp1Register,temp1Register);
+            Status = writeRawFrameData(temp1Register,temp1Register);
             if (Status != XST_SUCCESS) {
-            	xil_printf("READ RAW DATA failed \r\n");
+                xil_printf("READ RAW DATA failed \r\n");
             }
             cmd_status_substate = enter_value_or_quit("rsdcard",rsdcard);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case d5mgain:
             /*****************************************************************************************************************/
-            d5mgainSelect();
+            d5m_gain_select();
             cmd_status_substate = enter_value_or_quit("d5mgain",d5mgain);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case keyarrow1:
             /*****************************************************************************************************************/
-            keyArrow1Select();
+            key_arrow_1_select();
             cmd_status_substate = enter_value_or_quit("keyarrow",keyarrow);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case keyarrow2:
             /*****************************************************************************************************************/
-            keyArrow2Select();
+            key_arrow_2_select();
             cmd_status_substate = enter_value_or_quit("keyarrow",keyarrow);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case keyarrow3:
             /*****************************************************************************************************************/
-            keyArrow3Select();
+            key_arrow_3_select();
             cmd_status_substate = enter_value_or_quit("keyarrow",keyarrow);current_state = cmd_status_substate;break;
         case kernalconfig:
             /*****************************************************************************************************************/
-        	KernelConfig(&pCf);
+            kernel_config(&pCf);
             cmd_status_substate = enter_value_or_quit("kernalconfig",kernalconfig);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-            //                                                  videoFeatureSelect
-            /*****************************************************************************************************************/
-        case video0:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selCgain);
-            cmd_status_substate = enter_value_or_quit("video0",video0);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video1:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selSharp);
-            cmd_status_substate = enter_value_or_quit("video1",video1);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video2:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selBlur);
-            cmd_status_substate = enter_value_or_quit("video2",video2);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video3:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selHsl);
-            cmd_status_substate = enter_value_or_quit("video3",video3);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video4:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selHsv);
-            cmd_status_substate = enter_value_or_quit("video4",video4);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video5:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selRgb);
-            cmd_status_substate = enter_value_or_quit("video5",video5);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video6:
-            /*****************************************************************************************************************/
-            printf("Enter edgeThreshold Value\n");
-            menu_print_prompt();
-            t2Register = uart_prompt_io();
-            if (t2Register == clear) {
-                current_state = mainmenu;
-                break;}
-            edgeThresholdVal(t2Register);
-            printf("Enter edgeColor 1-Enable Else Disabled\n");
-            menu_print_prompt();
-            t3Register = uart_prompt_io();
-            if (t3Register == clear) {
-                current_state = mainmenu;
-                break;}
-            edgeColor(t3Register);
-            videoFeatureSelect(selSoble);
-            cmd_status_substate = enter_value_or_quit("video6",video6);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video7:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selEmboss);
-            cmd_status_substate = enter_value_or_quit("video7",video7);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video8:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelLum);
-            cmd_status_substate = enter_value_or_quit("video8",video8);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video9:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelTrm);
-            cmd_status_substate = enter_value_or_quit("video9",video9);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video10:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelRgb);
-            cmd_status_substate = enter_value_or_quit("video10",video10);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video11:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelShp);
-            cmd_status_substate = enter_value_or_quit("video11",video11);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video12:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelShp);
-            cmd_status_substate = enter_value_or_quit("video12",video12);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video13:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelBlu);
-            cmd_status_substate = enter_value_or_quit("video13",video13);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video14:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelYcc);
-            cmd_status_substate = enter_value_or_quit("video14",video14);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video15:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelHsv);
-            cmd_status_substate = enter_value_or_quit("video15",video15);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video16:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelHsl);
-            cmd_status_substate = enter_value_or_quit("video16",video16);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video17:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selMaskSobelCga);
-            cmd_status_substate = enter_value_or_quit("video17",video17);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video18:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selColorTrm);
-            cmd_status_substate = enter_value_or_quit("video18",video18);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video19:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selColorLmp);
-            cmd_status_substate = enter_value_or_quit("video19",video19);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video20:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selTPattern);
-            cmd_status_substate = enter_value_or_quit("video20",video20);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video21:
-            /*****************************************************************************************************************/
-        	CgainCoef();
-        	videoFeatureSelect(selCgainToCgain);
-            cmd_status_substate = enter_value_or_quit("video21",video21);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video22:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selCgainToHsl);
-            cmd_status_substate = enter_value_or_quit("video22",video22);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video23:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selCgainToHsv);
-            cmd_status_substate = enter_value_or_quit("video23",video23);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video24:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selCgainToYcbcr);
-            cmd_status_substate = enter_value_or_quit("video24",video24);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video25:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selCgainToShp);
-            cmd_status_substate = enter_value_or_quit("video25",video25);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video26:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selCgainToBlu);
-            cmd_status_substate = enter_value_or_quit("video26",video26);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video27:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selShpToCgain);
-            cmd_status_substate = enter_value_or_quit("video27",video27);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video28:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selShpToHsl);
-            cmd_status_substate = enter_value_or_quit("video28",video28);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video29:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selShpToHsv);
-            cmd_status_substate = enter_value_or_quit("video29",video29);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video30:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selShpToYcbcr);
-            cmd_status_substate = enter_value_or_quit("video30",video30);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video31:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selShpToShp);
-            cmd_status_substate = enter_value_or_quit("video31",video31);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video32:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selShpToBlu);
-            cmd_status_substate = enter_value_or_quit("video32",video32);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video33:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToBlu);
-            cmd_status_substate = enter_value_or_quit("video33",video33);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video34:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToCga);
-            cmd_status_substate = enter_value_or_quit("video34",video34);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video35:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToShp);
-            cmd_status_substate = enter_value_or_quit("video35",video35);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video36:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToYcc);
-            cmd_status_substate = enter_value_or_quit("video36",video36);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video37:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToHsv);
-            cmd_status_substate = enter_value_or_quit("video37",video37);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video38:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToHsl);
-            cmd_status_substate = enter_value_or_quit("video38",video38);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video39:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToCgaShp);
-            cmd_status_substate = enter_value_or_quit("video39",video39);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video40:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToCgaShpYcc);
-            cmd_status_substate = enter_value_or_quit("video40",video40);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video41:
-            /*****************************************************************************************************************/
-        	CgainCoef();
-        	videoFeatureSelect(selbluToCgaShpHsv);
-            cmd_status_substate = enter_value_or_quit("video41",video41);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video42:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToShpCga);
-            cmd_status_substate = enter_value_or_quit("video42",video42);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video43:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToShpCgaYcc);
-            cmd_status_substate = enter_value_or_quit("video43",video43);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video44:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selbluToShpCgaHsv);
-            cmd_status_substate = enter_value_or_quit("video44",video44);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video45:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selRgbCorrect);
-            cmd_status_substate = enter_value_or_quit("video45",video45);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video46:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selRgbRemix);
-            cmd_status_substate = enter_value_or_quit("video46",video46);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video47:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selRgbDetect);
-            cmd_status_substate = enter_value_or_quit("video47",video47);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video48:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selRgbPoi);
-            cmd_status_substate = enter_value_or_quit("video48",video48);current_state = cmd_status_substate;break;
-            /*****************************************************************************************************************/
-        case video49:
-            /*****************************************************************************************************************/
-            videoFeatureSelect(selYcbcr);
-            cmd_status_substate = enter_value_or_quit("video49",video49);current_state = cmd_status_substate;break;
         case ycbcrenable:
             /*****************************************************************************************************************/
             ycbcr_Enable();
@@ -721,12 +447,12 @@ void menu_calls(ON_OFF) {
             /*****************************************************************************************************************/
         case d5mw_regs:
             /*****************************************************************************************************************/
-        	d5mwRegs();
+            d5mwRegs();
             cmd_status_substate = enter_value_or_quit("d5mw_regs",d5mw_regs);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case d5mr_regs:
             /*****************************************************************************************************************/
-        	d5mr_reg();
+            d5mr_reg();
             cmd_status_substate = enter_value_or_quit("d5mr_regs",d5mr_regs);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case cmds_displaytype:
@@ -753,7 +479,7 @@ void menu_calls(ON_OFF) {
             /*****************************************************************************************************************/
         case fullhdmi:
             /*****************************************************************************************************************/
-        	d5mwRegs();
+            d5mwRegs();
             cmd_status_substate = enter_value_or_quit("fullhdmi",fullhdmi);current_state = cmd_status_substate;break;
         case hsvpervalue:
             /*****************************************************************************************************************/
@@ -795,7 +521,7 @@ void menu_calls(ON_OFF) {
             /*****************************************************************************************************************/
         case edgethreshold:
             /*****************************************************************************************************************/
-            cmd_status_value    = enter_value_or_quit("null",edgethreshold);edgeThresholdVal(cmd_status_value);
+            cmd_status_value    = enter_value_or_quit("null",edgethreshold);edge_threshold_val(cmd_status_value);
             cmd_status_substate = enter_value_or_quit("edgethreshold",edgethreshold);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case version:
@@ -1025,7 +751,7 @@ void menu_calls(ON_OFF) {
             if (t2Register == clear) {
                 current_state = mainmenu;
                 break;}
-            edgeThresholdVal(t2Register);
+            edge_threshold_val(t2Register);
             /*****************************************************************************************************************/
             printf("Enter ycbcrSelect Value\n");
             menu_print_prompt();
@@ -1090,7 +816,7 @@ void menu_calls(ON_OFF) {
             if (t2Register == clear) {
                 current_state = mainmenu;
                 break;}
-            edgeThresholdVal(t2Register);
+            edge_threshold_val(t2Register);
             cmd_status_substate = enter_value_or_quit("threshold",threshold);current_state = cmd_status_substate;break;
             /*****************************************************************************************************************/
         case timex:

@@ -1,15 +1,19 @@
-// LAST TESTED : 09/12/2019
+// LAST TESTED : 12/27/2019
+
 #include "filters.h"
+
 #include <sleep.h>
 #include <stdio.h>
 #include <xil_types.h>
+
 #include "../MENU_CALLS/menu_calls.h"
 #include "../SYSTEM_CONFIG_HEADER/kernels_defines.h"
 #include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
 #include "../UART/uartio.h"
 #include "../VIDEO_CHANNEL/channel.h"
+
 void CgCfPrintPrompt(u16 kValues,Coef *pCgCf,InCoef *pInCoef);
-void KernelInit(){
+void kernel_init(){
     pYcCf.K1   = YcCf_k1;
     pYcCf.K2   = YcCf_k2;
     pYcCf.K3   = YcCf_k3;
@@ -157,20 +161,20 @@ void CgainConfig(u16 kValues,Coef *pCf) {
     pCf->K8   = CgCf_k8 - kValues;
     pCf->K9   = CgCf_k9 + kValues;
 
-	pCf->Kc   = CgCf_kc;
+    pCf->Kc   = CgCf_kc;
     CgCoef(pCf);
 }
-void KernelConfig(Coef *pCf){
-	int keySelect   = kc;
-	int kcId;
-	int menu_Active = TRUE;
-	Xuint16 uKvalue = 0x0000;
-	while (menu_Active == TRUE) {
-		switch (keySelect) {
-		case clear:
-			menu_Active = FALSE;
-			break;
-		case kc:
+void kernel_config(Coef *pCf){
+    int keySelect   = kc;
+    int kcId;
+    int menu_Active = TRUE;
+    Xuint16 uKvalue = 0x0000;
+    while (menu_Active == TRUE) {
+        switch (keySelect) {
+        case clear:
+            menu_Active = FALSE;
+            break;
+        case kc:
             printKId();
             printf("Enter kc ID\n");
             menu_print_prompt();
@@ -238,15 +242,15 @@ void KernelConfig(Coef *pCf){
             else{
                 keySelect = kernalCoef;
                 break;}
-		case kernalCoef:
-			CgCoef(pCf);
+        case kernalCoef:
+            CgCoef(pCf);
             CgCfPrintPrompt(0,pCf,&pInCoef);
             printf("\n\n\n");
-			printf("Enter per k1-k9 or k0 for all\n");
+            printf("Enter per k1-k9 or k0 for all\n");
             menu_print_prompt();
-			keySelect = uart_prompt_io();
+            keySelect = uart_prompt_io();
             break;
-		case k0:
+        case k0:
             printf("Enter k1 Value\n");
             menu_print_prompt();
             pCf->K1  = uart_prompt_io();
@@ -276,76 +280,76 @@ void KernelConfig(Coef *pCf){
             pCf->K9  = uart_prompt_io();
             keySelect = kernalCoef;
             break;
-		case k1:
+        case k1:
             printf("Enter k1 Value\n");
             menu_print_prompt();
             pCf->K1  = uart_prompt_io();
             keySelect = kernalCoef;
             break;
-		case k2:
+        case k2:
             printf("Enter k2 Value\n");
             menu_print_prompt();
             uKvalue   = uart_prompt_io();
             pCf->K2  = ((~uKvalue)&0xFFFF)+ 0x1;
             keySelect = kernalCoef;
             break;
-		case k3:
+        case k3:
             printf("Enter k3 Value\n");
             menu_print_prompt();
             uKvalue   = uart_prompt_io();
             pCf->K3  = ((~uKvalue)&0xFFFF)+ 0x1;
             keySelect = kernalCoef;
             break;
-		case k4:
+        case k4:
             printf("Enter k4 Value\n");
             menu_print_prompt();
             uKvalue   = uart_prompt_io();
             pCf->K4  = ((~uKvalue)&0xFFFF)+ 0x1;
             keySelect = kernalCoef;
             break;
-		case k5:
+        case k5:
             printf("Enter k5 Value\n");
             menu_print_prompt();
             pCf->K5  = uart_prompt_io();
             keySelect = kernalCoef;
             break;
-		case k6:
+        case k6:
             printf("Enter k6 Value\n");
             menu_print_prompt();
             uKvalue   = uart_prompt_io();
             pCf->K6  = ((~uKvalue)&0xFFFF)+ 0x1;
             keySelect = kernalCoef;
             break;
-		case k7:
+        case k7:
             printf("Enter k7 Value\n");
             menu_print_prompt();
             uKvalue   = uart_prompt_io();
             pCf->K7  = ((~uKvalue)&0xFFFF)+ 0x1;
             keySelect = kernalCoef;
             break;
-		case k8:
+        case k8:
             printf("Enter k8 Value\n");
             menu_print_prompt();
             uKvalue   = uart_prompt_io();
             pCf->K8  = ((~uKvalue)&0xFFFF)+ 0x1;
             keySelect = kernalCoef;
             break;
-		case k9:
+        case k9:
             printf("Enter k9 Value\n");
             menu_print_prompt();
             pCf->K9  = uart_prompt_io();
             keySelect = kernalCoef;
             break;
-		case keygain:
-			keyCgainConfigSelect();
+        case keygain:
+            keyCgainConfigSelect();
         case menucall:
-        	menu_calls(TRUE);
+            menu_calls(TRUE);
             break;
-		default:
-			keySelect  = kernalCoef;
-			break;
-		}
-	}
+        default:
+            keySelect  = kernalCoef;
+            break;
+        }
+    }
 }
 void CgCoef(Coef *pCf) {
     D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,pCf->K1);
@@ -362,63 +366,63 @@ void CgCoef(Coef *pCf) {
     videoFeatureSelect(pCf->Vid);
 }
 void keyCgainConfigSelect(){
-	int keySelect    = menu_select;
-	u8 userinput     = 0;
-	u16 kValues      = 0;
-	int menu_Active  = TRUE;
+    int keySelect    = menu_select;
+    u8 userinput     = 0;
+    u16 kValues      = 0;
+    int menu_Active  = TRUE;
     KeyPrValue();
-	while (menu_Active == TRUE) {
-		switch (keySelect) {
-		case menuCheck:
-			menu_Active = FALSE;
-			break;
-		case menu_select:
+    while (menu_Active == TRUE) {
+        switch (keySelect) {
+        case menuCheck:
+            menu_Active = FALSE;
+            break;
+        case menu_select:
             menu_print_prompt();
             CgainConfig(kValues,&pCf);
             printf("\n\n");
             CgCfPrintPrompt(kValues,&pCf,&pInCoef);
-			userinput   = keypress_to_uart(uart_1_baseaddr);
-			keySelect   = userinput + 10;
-			break;
-		case KEYPRESS_ARROW_DOWN:
-			if (kValues <= 1)
-				kValues = 0;
-			else
-				kValues -= pKey.ValueDown;
-			keySelect  = menu_select;
-			break;
-		case KEYPRESS_ARROW_UP:
-			if (kValues > pKey.ValueMax)
-				kValues = pKey.ValueMax + 1;
-			else
-				kValues += pKey.ValueUp;
-			keySelect  = menu_select;
-			break;
-		case KEYPRESS_ARROW_RIGHT:
-			if (kValues > pKey.ValueMax)
-				kValues = pKey.ValueMax + 1;
-			else
-				kValues += pKey.ValueRight;
-			keySelect  = menu_select;
-			break;
-		case KEYPRESS_ARROW_LEFT:
-			if (kValues <= 1)
-				kValues = 1;
-			else
-				kValues -= pKey.ValueLeft;
-			keySelect  = menu_select;
-			break;
+            userinput   = keypress_to_uart(uart_1_baseaddr);
+            keySelect   = userinput + 10;
+            break;
+        case KEYPRESS_ARROW_DOWN:
+            if (kValues <= 1)
+                kValues = 0;
+            else
+                kValues -= pKey.ValueDown;
+            keySelect  = menu_select;
+            break;
+        case KEYPRESS_ARROW_UP:
+            if (kValues > pKey.ValueMax)
+                kValues = pKey.ValueMax + 1;
+            else
+                kValues += pKey.ValueUp;
+            keySelect  = menu_select;
+            break;
+        case KEYPRESS_ARROW_RIGHT:
+            if (kValues > pKey.ValueMax)
+                kValues = pKey.ValueMax + 1;
+            else
+                kValues += pKey.ValueRight;
+            keySelect  = menu_select;
+            break;
+        case KEYPRESS_ARROW_LEFT:
+            if (kValues <= 1)
+                kValues = 1;
+            else
+                kValues -= pKey.ValueLeft;
+            keySelect  = menu_select;
+            break;
         case kernalconfig:
-        	KernelConfig(&pCf);
+            kernel_config(&pCf);
             break;
         case menucall:
-        	menu_calls(TRUE);
+            menu_calls(TRUE);
             break;
-		default:
-			keySelect  = menu_select;
-			break;
-		}
-	}
+        default:
+            keySelect  = menu_select;
+            break;
+        }
+    }
 }
 void KeyPrValue(){
     printf("Enter KeyPr ValueDown\n");

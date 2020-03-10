@@ -1,17 +1,13 @@
-// LAST TESTED : 02/08/2018
-
+// LAST TESTED : 12/27/2019
 #include "i2c_d5m.h"
-
 #include <sleep.h>
 #include <stdio.h>
 #include <xiic_l.h>
 #include <xil_printf.h>
-#include <xil_types.h>
 #include <xparameters.h>
 #include <xstatus.h>
-
-#include "../UART/uartio.h"
 #include "../SYSTEM_CONFIG_HEADER/system_config_defines.h"
+#include "../UART/uartio.h"
 #define SENSOR_ADDRESS 0x5d // 0xBA - write mode, 0xBB read mode
 #define IMG_OUTPUT_CONTROL 7
 #define IMG_GLOBAL_GAIN 0x35
@@ -317,36 +313,28 @@ void d5mReadColorGainExpos(d5m_rreg *d5m_rreg_ptr) {
     xil_printf("\t [8    ]-RED    GAIN            = 0x%04d\n\r",d5m_rreg_ptr->red_gain);
     xil_printf("\t [8    ]-GREEN2 GAIN            = 0x%04d\n\r",d5m_rreg_ptr->green2_gain);
 }
-
 void d5mcolorgain() {
-	
     int ret  = 0;
     u32 gr1  = 0;
     u32 gr2  = 0;
     u32 blu  = 0;
     u32 red  = 0;
     u32 exp  = 0;
-	
     printf("Enter Green1 Gain Value\n");
     menu_print_prompt();
     gr1 = uart_prompt_io();
-	
     printf("Enter Blue Gain Value\n");
     menu_print_prompt();
     blu = uart_prompt_io();
-	
     printf("Enter Red Gain Value\n");
     menu_print_prompt();
     red = uart_prompt_io();
-	
     printf("Enter Green2 Gain Value\n");
     menu_print_prompt();
     gr2 = uart_prompt_io();
-	
     printf("Enter Exposer Value\n");
     menu_print_prompt();
     exp = uart_prompt_io();
-	
     ret = img_write_register(43,gr1);   //Green1 Gain
     usleep(1);
     ret |= img_write_register(44,blu);//Blue Gain
@@ -357,18 +345,12 @@ void d5mcolorgain() {
     usleep(1);
     ret |= img_write_register(9,exp);  //frame exposer
     usleep(1);
-
-	
     //or combine check
     if (ret == 1)    print("transmitted\n");
     else print("more bytes to transmit-- check error\n");
-
 }
-
 void setColorGain(u16 gain,u16 exp) {
-	
     int ret  = 0;
-
     ret = img_write_register(43,gain); //Green1 Gain
     usleep(1);
     ret |= img_write_register(44,gain);//Blue Gain
@@ -379,16 +361,13 @@ void setColorGain(u16 gain,u16 exp) {
     usleep(1);
     ret |= img_write_register(9,exp);  //frame exposer
     usleep(1);
-	
     //or combine check
     if (ret == 1)    print("Transmitted\n");
     else print("more bytes to transmit-- check error\n");
-	//read registers
-	D5mReg(&d5m_rreg_ptr);
-	d5mReadColorGainExpos(&d5m_rreg_ptr);
-
+    //read registers
+    D5mReg(&d5m_rreg_ptr);
+    d5mReadColorGainExpos(&d5m_rreg_ptr);
 }
-
 void d5mwTestpattern(u16 pattern_num) {
     int ret = 0;
     ret = img_write_register(161,50); //Test_Pattern_Green
@@ -727,7 +706,6 @@ void d5mr_reg() {
     cameraread(&d5m_rreg_ptr);
     printf("D5mRegs Updated\n");
 }
-
 void camera_hdmi_config() {
     int ret = 0;
     u16 R_01_value = 0x0036; //    set start row
@@ -737,15 +715,11 @@ void camera_hdmi_config() {
     u16 R_05_value = 0x0000; //    H_Blanking
     u16 R_06_value = 0x0008; //    V_Blanking
     u16 R_0A_value = 0x8000; //    change latch
-
     u16 camera_exposer_value =0x03e8;// should be less then R_03_value
-
-
     u16 R_10_value = 0x0051; //    set up PLL power on
     u16 R_11_value = 0x1409; //PLL_m_Factor<<8+PLL_n_Divider
     u16 R_12_value = 0x0001; // PLL_p1_Divider
     u16 R_1X_value = 0x0053; //    set USE PLL
-
     u16 R_20_value = 0xc040; //    Mirror Row and Columns
     u16 R_22_value = 0x0000; //    set row mode in bin mode
     u16 R_23_value = 0x0000; //    set column mode     in bin mode
@@ -775,7 +749,6 @@ void camera_hdmi_config() {
     ret |=  img_write_register(0x006,R_06_value);
     ret |=  img_write_register(0x009,camera_exposer_value);
     ret |=  img_write_register(0x00A,R_0A_value);
-
     ret |=  img_write_register(0x020,R_20_value);
     ret |=  img_write_register(0x022,R_22_value);
     ret |=  img_write_register(0x023,R_23_value);
@@ -803,6 +776,9 @@ void camera_hdmi_config() {
     //else print("more bytes to transmit-- check error\n");
     //D5M_mWriteReg(D5M_BASE,REG4,0);
 }
+
+
+
 void camera_vga_config() {
     int ret = 0;
     u16 R_01_value = 0x0000; //    set start row @ 0

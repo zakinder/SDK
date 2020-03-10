@@ -1,4 +1,4 @@
-// LAST TESTED : 05/04/2019
+// LAST TESTED : 12/27/2019
 
 #include "uartio.h"
 
@@ -14,7 +14,7 @@
 
 char uart_per_char_read(u32 uart_address)
 {
-	char uart_io;
+    char uart_io;
     if (uart_address == uart_1_baseaddr)
         read(1, (char*) &uart_io, 1);
     return (uart_io);
@@ -52,7 +52,7 @@ char* char_to_uart(char auserinput[])
 }
 // char* char_to_uart(char uart_s[])
 // {
-	// char uart_s = uart_per_char_read(uart_1_baseaddr);
+    // char uart_s = uart_per_char_read(uart_1_baseaddr);
     // return (uart_s);
 // }
 
@@ -74,27 +74,27 @@ u16 uart_two_byte_read(u32 uart_address)
 }
 u8 keypress_to_uart(u32 uart_address)
 {
-	u32 uart_io;
-	uart_io = uart_per_byte_read(uart_address);
-	if (uart_io == 27) {
-		uart_io = uart_per_byte_read(uart_address);
-		if (uart_io == 91) {
-			uart_io = uart_per_byte_read(uart_address);
-			if (uart_io == 65)
-				uart_io = KEYPRESS_ARROW_UP - 10;
-			if (uart_io == 66)
-				uart_io = KEYPRESS_ARROW_DOWN - 10;
-			if (uart_io == 67)
-				uart_io = KEYPRESS_ARROW_RIGHT - 10;
-			if (uart_io == 68)
-				uart_io = KEYPRESS_ARROW_LEFT - 10;
-			if (uart_io == 75)
-				uart_io = KEYPRESS_END - 10;
-		}
-	} else if (uart_io >= 48 && uart_io <= 57)
-		uart_io -= 48;
-	else if (uart_io >= 97 && uart_io <= 122)
-		uart_io -= 32;
+    u32 uart_io;
+    uart_io = uart_per_byte_read(uart_address);
+    if (uart_io == 27) {
+        uart_io = uart_per_byte_read(uart_address);
+        if (uart_io == 91) {
+            uart_io = uart_per_byte_read(uart_address);
+            if (uart_io == 65)
+                uart_io = KEYPRESS_ARROW_UP - 10;
+            if (uart_io == 66)
+                uart_io = KEYPRESS_ARROW_DOWN - 10;
+            if (uart_io == 67)
+                uart_io = KEYPRESS_ARROW_RIGHT - 10;
+            if (uart_io == 68)
+                uart_io = KEYPRESS_ARROW_LEFT - 10;
+            if (uart_io == 75)
+                uart_io = KEYPRESS_END - 10;
+        }
+    } else if (uart_io >= 48 && uart_io <= 57)
+        uart_io -= 48;
+    else if (uart_io >= 97 && uart_io <= 122)
+        uart_io -= 32;
     return (uart_io);
 }
 u32 uart_prompt_io()
@@ -339,190 +339,190 @@ u32 uartcmd(u32 argA,u32 argB)
     if (uartquit == cmds_quit || uartquit == 0x00) {return argA;
     } else {return argB;}
 }
-void d5mgainSelect()
+void d5m_gain_select()
 {
-	d5m_rreg d5m_rreg_ptr;
-	D5mReg(&d5m_rreg_ptr);
+    d5m_rreg d5m_rreg_ptr;
+    D5mReg(&d5m_rreg_ptr);
 
-	int nMenu_State  = 1;
-	u8 userinput     = 0;
+    int nMenu_State  = 1;
+    u8 userinput     = 0;
 
-	u16 gain         = d5m_rreg_ptr.green1_gain;
-	u16 exp          = d5m_rreg_ptr.shutter_width_lower;
+    u16 gain         = d5m_rreg_ptr.green1_gain;
+    u16 exp          = d5m_rreg_ptr.shutter_width_lower;
 
 
 
-	int menu_Active = TRUE;
-	
-	while (menu_Active == TRUE) {
-		switch (nMenu_State) {
-			
-		case menuCheck: //exit keyArrors 19
-			menu_Active = FALSE;
-			break;
-			
-		case menu_select:
-		
+    int menu_Active = TRUE;
+    
+    while (menu_Active == TRUE) {
+        switch (nMenu_State) {
+            
+        case menuCheck: //exit keyArrors 19
+            menu_Active = FALSE;
+            break;
+            
+        case menu_select:
+        
             menu_print_prompt();
-			
+            
             //Select video Coef Vals Updates
-			setColorGain(gain,exp);
-			
-			//User input Keyarrow Direction
-			userinput = keypress_to_uart(uart_1_baseaddr);
-			
-			//Go to Keyarrow Direction State
-			nMenu_State = userinput + 10;
-			
-			break;
-			
-		case KEYPRESS_ARROW_DOWN: 
-			if (gain <= 1)
-				gain = 0;
-			else
-				gain -= 1;
-			nMenu_State = menu_select;
-			break;
-			
-		case KEYPRESS_ARROW_UP:  
-			if (gain > 8092)
-				gain = 8093;
-			else
-				gain += 1;
-			nMenu_State = menu_select;
-			break;
-			
-		case KEYPRESS_ARROW_LEFT: 
-			if (exp > 8092)
-				exp = 8093;
-			else
-				exp += 10;
-			nMenu_State = menu_select;
-			break;
-			
-		case KEYPRESS_ARROW_RIGHT: 
-			if (exp <= 1)
-				exp = 1;
-			else
-				exp -= 10;
-			nMenu_State = menu_select;
-			break;
-			
-		default:
-			nMenu_State = menu_select;
-			break;
-		}
-	}
+            setColorGain(gain,exp);
+            
+            //User input Keyarrow Direction
+            userinput = keypress_to_uart(uart_1_baseaddr);
+            
+            //Go to Keyarrow Direction State
+            nMenu_State = userinput + 10;
+            
+            break;
+            
+        case KEYPRESS_ARROW_DOWN: 
+            if (gain <= 1)
+                gain = 0;
+            else
+                gain -= 1;
+            nMenu_State = menu_select;
+            break;
+            
+        case KEYPRESS_ARROW_UP:  
+            if (gain > 8092)
+                gain = 8093;
+            else
+                gain += 1;
+            nMenu_State = menu_select;
+            break;
+            
+        case KEYPRESS_ARROW_LEFT: 
+            if (exp > 8092)
+                exp = 8093;
+            else
+                exp += 10;
+            nMenu_State = menu_select;
+            break;
+            
+        case KEYPRESS_ARROW_RIGHT: 
+            if (exp <= 1)
+                exp = 1;
+            else
+                exp -= 10;
+            nMenu_State = menu_select;
+            break;
+            
+        default:
+            nMenu_State = menu_select;
+            break;
+        }
+    }
 }
-void keyArrow1Select()
+void key_arrow_1_select()
 {
-	int nMenu_State  = 1;
-	u8 userinput     = 0;
-	u16 testValues   = 1;
+    int nMenu_State  = 1;
+    u8 userinput     = 0;
+    u16 testValues   = 1;
     int filterNumber = 0;
-	
-	int menu_Active = TRUE;
+    
+    int menu_Active = TRUE;
     printf("Enter Filter Number\n");
     menu_print_prompt();
     filterNumber = uart_prompt_io();
-	videoFeatureSelect(filterNumber);
-	while (menu_Active == TRUE) {
-		switch (nMenu_State) {
-			
-		case menuCheck: //exit keyArrors 19
-			menu_Active = FALSE;
-			break;
-			
-		case menu_select:
-		
+    videoFeatureSelect(filterNumber);
+    while (menu_Active == TRUE) {
+        switch (nMenu_State) {
+            
+        case menuCheck: //exit keyArrors 19
+            menu_Active = FALSE;
+            break;
+            
+        case menu_select:
+        
             menu_print_prompt();
-			
+            
             //Select video Coef Vals Updates
 
-			
-			//User input Keyarrow Direction
-			userinput = keypress_to_uart(uart_1_baseaddr);
-			//Go to Keyarrow Direction State
-			nMenu_State = userinput + 10;
-			
-			break;
-			
-		case KEYPRESS_ARROW_DOWN: 
-			if (testValues <= 1){
-				testValues = 0;   //MINIMUM SET VALUE
-		     }else{
-				testValues -= 10; //DECREMENT BY 1
-		     }
+            
+            //User input Keyarrow Direction
+            userinput = keypress_to_uart(uart_1_baseaddr);
+            //Go to Keyarrow Direction State
+            nMenu_State = userinput + 10;
+            
+            break;
+            
+        case KEYPRESS_ARROW_DOWN: 
+            if (testValues <= 1){
+                testValues = 0;   //MINIMUM SET VALUE
+             }else{
+                testValues -= 10; //DECREMENT BY 1
+             }
 
-			videokCoefValsUpdate(testValues,filterNumber);
-			nMenu_State = menu_select;
-			break;
-			
-		case KEYPRESS_ARROW_UP:  
-			if (testValues > 8092){
-				testValues = 8093;//MAXIMUM SET VALUE
-		     }else{
-				testValues += 10; //INCREMENT BY 1
-		     }
-			videokCoefValsUpdate(testValues,filterNumber);
-			nMenu_State = menu_select;
-			break;
-			
-		case KEYPRESS_ARROW_LEFT: 
-			if (testValues > 8092){
-				testValues = 8093; //MAXIMUM SET VALUE
-		     }else{
-				testValues += 100; //INCREMENT BY 2
-		     }
-			videokCoefValsUpdate(testValues,filterNumber);
-			nMenu_State = menu_select;
-			break;
-			
-		case KEYPRESS_ARROW_RIGHT: 
-			if (testValues <= 1){
-				testValues = 1;    //MINIMUM SET VALUE
-		     }else{
-				testValues -= 100; //DECREMENT BY 2
-		     }
-			videokCoefValsUpdate(testValues,filterNumber);
-			nMenu_State = menu_select;
-			break;
-			
-		default:
-			nMenu_State = menu_select;
-			break;
-		}
-	}
+            videokCoefValsUpdate(testValues,filterNumber);
+            nMenu_State = menu_select;
+            break;
+            
+        case KEYPRESS_ARROW_UP:  
+            if (testValues > 8092){
+                testValues = 8093;//MAXIMUM SET VALUE
+             }else{
+                testValues += 10; //INCREMENT BY 1
+             }
+            videokCoefValsUpdate(testValues,filterNumber);
+            nMenu_State = menu_select;
+            break;
+            
+        case KEYPRESS_ARROW_LEFT: 
+            if (testValues > 8092){
+                testValues = 8093; //MAXIMUM SET VALUE
+             }else{
+                testValues += 100; //INCREMENT BY 2
+             }
+            videokCoefValsUpdate(testValues,filterNumber);
+            nMenu_State = menu_select;
+            break;
+            
+        case KEYPRESS_ARROW_RIGHT: 
+            if (testValues <= 1){
+                testValues = 1;    //MINIMUM SET VALUE
+             }else{
+                testValues -= 100; //DECREMENT BY 2
+             }
+            videokCoefValsUpdate(testValues,filterNumber);
+            nMenu_State = menu_select;
+            break;
+            
+        default:
+            nMenu_State = menu_select;
+            break;
+        }
+    }
 }
 
 
-void keyArrow2Select()
+void key_arrow_2_select()
 {
-	int nMenu_State = 1;
-	u8 userinput = 0;
-	int testValues = 1;
+    int nMenu_State = 1;
+    u8 userinput = 0;
+    int testValues = 1;
     int filterNumber = 0;
-	unsigned int uK1 = kCoefVals_kCoef2Cgain_k1;
-	unsigned int uK2 = (~kCoefVals_kCoef2Cgain_k2)&0x00FF;
-	unsigned int uK3 = (~kCoefVals_kCoef2Cgain_k3)&0x00FF;
-	unsigned int uK4 = kCoefVals_kCoef2Cgain_k4;
-	unsigned int uK5 = (~kCoefVals_kCoef2Cgain_k5)&0x00FF;
-	unsigned int uK6 = (~kCoefVals_kCoef2Cgain_k6)&0x00FF;
-	unsigned int uK7 = kCoefVals_kCoef2Cgain_k7;
-	unsigned int uK8 = (~kCoefVals_kCoef2Cgain_k8)&0x00FF;
-	unsigned int uK9 = (~kCoefVals_kCoef2Cgain_k9)&0x00FF;
-	int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
-	int menu_Active = TRUE;
+    unsigned int uK1 = kCoefVals_kCoef2Cgain_k1;
+    unsigned int uK2 = (~kCoefVals_kCoef2Cgain_k2)&0x00FF;
+    unsigned int uK3 = (~kCoefVals_kCoef2Cgain_k3)&0x00FF;
+    unsigned int uK4 = kCoefVals_kCoef2Cgain_k4;
+    unsigned int uK5 = (~kCoefVals_kCoef2Cgain_k5)&0x00FF;
+    unsigned int uK6 = (~kCoefVals_kCoef2Cgain_k6)&0x00FF;
+    unsigned int uK7 = kCoefVals_kCoef2Cgain_k7;
+    unsigned int uK8 = (~kCoefVals_kCoef2Cgain_k8)&0x00FF;
+    unsigned int uK9 = (~kCoefVals_kCoef2Cgain_k9)&0x00FF;
+    int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
+    int menu_Active = TRUE;
     printf("Enter Filter Number\n");
     menu_print_prompt();
     filterNumber = uart_prompt_io();
-	videoFeatureSelect(filterNumber);
-	while (menu_Active == TRUE) {
-		switch (nMenu_State) {
-		case menuCheck: //exit keyArrors 19
-			menu_Active = FALSE;
-			break;
-		case menu_select:
+    videoFeatureSelect(filterNumber);
+    while (menu_Active == TRUE) {
+        switch (nMenu_State) {
+        case menuCheck: //exit keyArrors 19
+            menu_Active = FALSE;
+            break;
+        case menu_select:
             menu_print_prompt();
             uK1 = kCoefVals_kCoef2Cgain_k1 + testValues;
             uK2 = (~(kCoefVals_kCoef2Cgain_k2+testValues))&0x00FF;
@@ -552,84 +552,84 @@ void keyArrow2Select()
             "|-------|-------|-------|\r\n"
             "|%d   |%d   |%d   |\r\n"
             "|-------|-------|-------|\r\n",K1,K2,K3,K4,K5,K6,K7,K8,K9);
-			printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
-			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef2Cgain_k1 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef2Cgain_k2 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef2Cgain_k3 - testValues);//-
+            printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
+            D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef2Cgain_k1 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef2Cgain_k2 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef2Cgain_k3 - testValues);//-
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef2Cgain_k4 - testValues);//-
-		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef2Cgain_k5 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef2Cgain_k6 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef2Cgain_k4 - testValues);//-
+            D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef2Cgain_k5 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef2Cgain_k6 + testValues);//+
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef2Cgain_k7 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef2Cgain_k8 - testValues);//-
-		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef2Cgain_k9 + testValues);//+
-			D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
-			//videoFeatureSelect(selCgain);
-			userinput = keypress_to_uart(uart_1_baseaddr);
-			nMenu_State = userinput + 10;
-			break;
-		case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
-			//if (testValues <= 1)
-			//	testValues = 0;   //MINIMUM SET VALUE
-			//else
-				testValues -= 333;
-			nMenu_State = menu_select;
-			break;
-		case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
-			//if (testValues > 8092)
-			//	testValues = 8093;//MAXIMUM SET VALUE
-			//else
-				testValues += 333;
-			nMenu_State = menu_select;
-			break;
-		case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
-			//if (testValues > 8092)
-			//	testValues = 8093; //MAXIMUM SET VALUE
-			//else
-				testValues += 100;
-			nMenu_State = menu_select;
-			break;
-		case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
-			//if (testValues <= 1)
-			//	testValues = 1;    //MINIMUM SET VALUE
-			//else
-				testValues -= 100;
-			nMenu_State = menu_select;
-			break;
-		default:
-			nMenu_State = menu_select;
-			break;
-		}
-	}
+            D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef2Cgain_k7 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef2Cgain_k8 - testValues);//-
+            D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef2Cgain_k9 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
+            //videoFeatureSelect(selCgain);
+            userinput = keypress_to_uart(uart_1_baseaddr);
+            nMenu_State = userinput + 10;
+            break;
+        case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
+            //if (testValues <= 1)
+            //    testValues = 0;   //MINIMUM SET VALUE
+            //else
+                testValues -= 333;
+            nMenu_State = menu_select;
+            break;
+        case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
+            //if (testValues > 8092)
+            //    testValues = 8093;//MAXIMUM SET VALUE
+            //else
+                testValues += 333;
+            nMenu_State = menu_select;
+            break;
+        case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
+            //if (testValues > 8092)
+            //    testValues = 8093; //MAXIMUM SET VALUE
+            //else
+                testValues += 100;
+            nMenu_State = menu_select;
+            break;
+        case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
+            //if (testValues <= 1)
+            //    testValues = 1;    //MINIMUM SET VALUE
+            //else
+                testValues -= 100;
+            nMenu_State = menu_select;
+            break;
+        default:
+            nMenu_State = menu_select;
+            break;
+        }
+    }
 }
-void keyArrow3Select()
+void key_arrow_3_select()
 {
-	int nMenu_State = 1;
-	u8 userinput     = 0;
-	u16 testValues   = 1;
+    int nMenu_State = 1;
+    u8 userinput     = 0;
+    u16 testValues   = 1;
     int filterNumber = 0;
-	unsigned int uK1 = kCoefVals_kCoef7Cgain_k1;
-	unsigned int uK2 = (~kCoefVals_kCoef7Cgain_k2)&0x00FF;
-	unsigned int uK3 = (~kCoefVals_kCoef7Cgain_k3)&0x00FF;
-	unsigned int uK4 = kCoefVals_kCoef7Cgain_k4;
-	unsigned int uK5 = (~kCoefVals_kCoef7Cgain_k5)&0x00FF;
-	unsigned int uK6 = (~kCoefVals_kCoef7Cgain_k6)&0x00FF;
-	unsigned int uK7 = kCoefVals_kCoef7Cgain_k7;
-	unsigned int uK8 = (~kCoefVals_kCoef7Cgain_k8)&0x00FF;
-	unsigned int uK9 = (~kCoefVals_kCoef7Cgain_k9)&0x00FF;
-	int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
-	int menu_Active = TRUE;
+    unsigned int uK1 = kCoefVals_kCoef7Cgain_k1;
+    unsigned int uK2 = (~kCoefVals_kCoef7Cgain_k2)&0x00FF;
+    unsigned int uK3 = (~kCoefVals_kCoef7Cgain_k3)&0x00FF;
+    unsigned int uK4 = kCoefVals_kCoef7Cgain_k4;
+    unsigned int uK5 = (~kCoefVals_kCoef7Cgain_k5)&0x00FF;
+    unsigned int uK6 = (~kCoefVals_kCoef7Cgain_k6)&0x00FF;
+    unsigned int uK7 = kCoefVals_kCoef7Cgain_k7;
+    unsigned int uK8 = (~kCoefVals_kCoef7Cgain_k8)&0x00FF;
+    unsigned int uK9 = (~kCoefVals_kCoef7Cgain_k9)&0x00FF;
+    int   K1,K2,K3,K4,K5,K6,K7,K8,K9;
+    int menu_Active = TRUE;
     printf("Enter Filter Number\n");
     menu_print_prompt();
     filterNumber = uart_prompt_io();
-	videoFeatureSelect(filterNumber);
-	while (menu_Active == TRUE) {
-		switch (nMenu_State) {
-		case menuCheck: //exit keyArrors 19
-			menu_Active = FALSE;
-			break;
-		case menu_select:
+    videoFeatureSelect(filterNumber);
+    while (menu_Active == TRUE) {
+        switch (nMenu_State) {
+        case menuCheck: //exit keyArrors 19
+            menu_Active = FALSE;
+            break;
+        case menu_select:
             menu_print_prompt();
             uK1 = kCoefVals_kCoef7Cgain_k1 + testValues;
             uK2 = (~(kCoefVals_kCoef7Cgain_k2+testValues))&0x00FF;
@@ -659,56 +659,56 @@ void keyArrow3Select()
             "|-------|-------|-------|\r\n"
             "|%d   |%d   |%d   |\r\n"
             "|-------|-------|-------|\r\n",K1,K2,K3,K4,K5,K6,K7,K8,K9);
-			printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
-			D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef7Cgain_k1 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef7Cgain_k2 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef7Cgain_k3 - testValues);//-
+            printf(">>>>>>>>>>>>>>>>>>>>>%d",(unsigned)testValues);
+            D5M_mWriteReg(D5M_BASE,w_kernal_1_reg_08,kCoefVals_kCoef7Cgain_k1 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_2_reg_09,kCoefVals_kCoef7Cgain_k2 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_3_reg_10,kCoefVals_kCoef7Cgain_k3 - testValues);//-
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef7Cgain_k4 - testValues);//-
-		    D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef7Cgain_k5 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef7Cgain_k6 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_4_reg_11,kCoefVals_kCoef7Cgain_k4 - testValues);//-
+            D5M_mWriteReg(D5M_BASE,w_kernal_5_reg_12,kCoefVals_kCoef7Cgain_k5 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_6_reg_13,kCoefVals_kCoef7Cgain_k6 + testValues);//+
 
-		    D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef7Cgain_k7 + testValues);//+
-		    D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef7Cgain_k8 - testValues);//-
-		    D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef7Cgain_k9 + testValues);//+
-			D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
-			//videoFeatureSelect(selCgain);
-			userinput = keypress_to_uart(uart_1_baseaddr);
-			nMenu_State = userinput + 10;
-			break;
-		case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
-		//	if (testValues <= 1)
-		//		testValues = 0;   //MINIMUM SET VALUE
-		//	else
-				testValues -= 777;
-			nMenu_State = menu_select;
-			break;
-		case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
-			//if (testValues > 8092)
-		//		testValues = 8093;//MAXIMUM SET VALUE
-		//	else
-				testValues += 666;
-			nMenu_State = menu_select;
-			break;
-		case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
-			//if (testValues > 8092)
-		//		testValues = 8093; //MAXIMUM SET VALUE
-		//	else
-				testValues += 999;
-			nMenu_State = menu_select;
-			break;
-		case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
-		//	if (testValues <= 1)
-		//		testValues = 1;    //MINIMUM SET VALUE
-		//	else
-				testValues -= 933;
-			nMenu_State = menu_select;
-			break;
-		default:
-			nMenu_State = menu_select;
-			break;
-		}
-	}
+            D5M_mWriteReg(D5M_BASE,w_kernal_7_reg_14,kCoefVals_kCoef7Cgain_k7 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kernal_8_reg_15,kCoefVals_kCoef7Cgain_k8 - testValues);//-
+            D5M_mWriteReg(D5M_BASE,w_kernal_9_reg_16,kCoefVals_kCoef7Cgain_k9 + testValues);//+
+            D5M_mWriteReg(D5M_BASE,w_kSet_reg_17,kCoefVals_kCoeffCgain_kSet);
+            //videoFeatureSelect(selCgain);
+            userinput = keypress_to_uart(uart_1_baseaddr);
+            nMenu_State = userinput + 10;
+            break;
+        case KEYPRESS_ARROW_DOWN: //DECREMENT BY 1
+        //    if (testValues <= 1)
+        //        testValues = 0;   //MINIMUM SET VALUE
+        //    else
+                testValues -= 777;
+            nMenu_State = menu_select;
+            break;
+        case KEYPRESS_ARROW_UP:  //INCREMENT BY 1
+            //if (testValues > 8092)
+        //        testValues = 8093;//MAXIMUM SET VALUE
+        //    else
+                testValues += 666;
+            nMenu_State = menu_select;
+            break;
+        case KEYPRESS_ARROW_LEFT: //INCREMENT BY 2
+            //if (testValues > 8092)
+        //        testValues = 8093; //MAXIMUM SET VALUE
+        //    else
+                testValues += 999;
+            nMenu_State = menu_select;
+            break;
+        case KEYPRESS_ARROW_RIGHT: //DECREMENT BY 2
+        //    if (testValues <= 1)
+        //        testValues = 1;    //MINIMUM SET VALUE
+        //    else
+                testValues -= 933;
+            nMenu_State = menu_select;
+            break;
+        default:
+            nMenu_State = menu_select;
+            break;
+        }
+    }
 }
 void cmds_menu() 
 {

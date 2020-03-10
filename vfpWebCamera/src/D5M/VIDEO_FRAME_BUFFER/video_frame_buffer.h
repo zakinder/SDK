@@ -1,8 +1,9 @@
 #ifndef __VIDEO_FRAME_BUFFER_H__
 #define __VIDEO_FRAME_BUFFER_H__
+
 #include <xaxivdma.h>
 #include <xbasic_types.h>
-#include <xil_types.h>
+
 int vfb_common_init( u16 uDeviceId, XAxiVdma * InstancePtr );
 int vfb_rx_init( XAxiVdma *pAxiVdma, XAxiVdma_DmaSetup *pWriteCfg, Xuint32 uVideoResolution, Xuint32 uStorageResolution, Xuint32 uMemAddr, Xuint32 uNumFrames );
 int vfb_rx_setup( XAxiVdma *pAxiVdma, XAxiVdma_DmaSetup *pWriteCfg, Xuint32 uVideoResolution, Xuint32 uStorageResolution, Xuint32 uMemAddr, Xuint32 uNumFrames );

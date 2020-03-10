@@ -5,11 +5,9 @@
 #include <xil_io.h>
 #include <xil_types.h>
 #include <xstatus.h>
-
 #include "../SYSTEM_CONFIG_HEADER/system_config_header.h"
 #include "../UART/uartio.h"
 #include "../VIDEO_CHANNEL/channel.h"
-
 #define MAX_STRING_LENGTH 80
 #define PIXEL_LENGTH 7
 static FIL fil;
@@ -18,10 +16,10 @@ static FIL oFil;
 static FATFS fatfs;
 static char *SD_File;
 static char *SD2File;
-FRESULT Res;
+FRESULT res;
 u64 adrSof;
 u32 adrEof;
-u8  nAddre;
+u8 nAddre;
 u16 nPattn;
 u16 nRgb;
 u32 x;
@@ -33,44 +31,50 @@ int j;
 int pix;
 UINT bw; // bytes written
 TCHAR *Path = "0:/";
-int wr_fr_data1()
-{
-    adrSof  = 0x2008700;//skip 1st line
-    adrEof  = 0x23F47FF;
-    nAddre  = 0x2;
-    nPattn  = 0x1;
-    nRgb    = 0x0;
-    row     = 0;
-    col     = 0;
+int wr_fr_data1() {
+    adrSof = 0x2008700; //skip 1st line
+    adrEof = 0x23F47FF;
+    nAddre = 0x2;
+    nPattn = 0x1;
+    nRgb = 0x0;
+    row = 0;
+    col = 0;
     int len;
-    rawRgbSelect(nPattn);
+    raw_rgb_select(nPattn);
     printf("Enter file name with extension\n");
     menu_print_prompt();
     char FileName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(FileName);
-    SD_File  = (char *)FileName;
+    SD_File = (char *) FileName;
     printf("Enter num of rows to be saved[1071]\n");
     menu_print_prompt();
     row = uart_prompt_io();
     printf("Enter num of rows to be saved[1920]\n");
     menu_print_prompt();
     col = uart_prompt_io();
-    Res = f_mount(&fatfs,Path,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_open(&fil,SD_File,FA_CREATE_ALWAYS|FA_WRITE|FA_READ);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&fil,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf  ("1ST PIXEL VALUE %i\n",(unsigned)(Xil_In8(adrSof) & 0xffff));
-    for(y = 0; y < row; y++) {
-        for(x = 0; x < col; x++) {
+    res = f_mount(&fatfs, Path, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_open(&fil, SD_File, FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&fil, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("1ST PIXEL VALUE %i\n", (unsigned) (Xil_In8(adrSof) & 0xffff));
+    for (y = 0; y < row; y++) {
+        for (x = 0; x < col; x++) {
             unsigned char buffer[PIXEL_LENGTH] = { 0 };
             //1st field: buffer-out
             //2nd field: max number of bytes that will be written to the buffer
             //3rd field: Input value format
             //4rd field: Input value to be formated
-            len =snprintf((void*)buffer,sizeof(buffer),"%d ",(Xil_In8(adrSof)));
-            unsigned char *response = (void*)buffer;
+            len = snprintf((void*) buffer, sizeof(buffer), "%d ",
+                    (Xil_In8(adrSof)));
+            unsigned char *response = (void*) buffer;
             //increment pixel address
             adrSof = adrSof + nAddre;
             //FRESULT f_write (
@@ -79,62 +83,79 @@ int wr_fr_data1()
             //UINT btw,            /* Number of bytes to write */
             //UINT* bw            /* Pointer to number of bytes written */
             //)
-            Res = f_write(&fil,response,len,&bw);
-            if (Res) {return XST_FAILURE;}
+            res = f_write(&fil, response, len, &bw);
+            if (res) {
+                return XST_FAILURE;
+            }
         }
-        Res = f_write(&fil, "\n", 1, &bw);
-        if (Res != FR_OK) {return XST_FAILURE;}
+        res = f_write(&fil, "\n", 1, &bw);
+        if (res != FR_OK) {
+            return XST_FAILURE;
+        }
         //adrSof = adrSof + 0x7800;
-   }
-    printf  ("x      %i\n", row);
-    printf  ("y      %i\n", y);
-    rawRgbSelect(0x0);
-    Res = f_close(&fil);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    }
+    printf("x      %i\n", row);
+    printf("y      %i\n", y);
+    raw_rgb_select(0x0);
+    res = f_close(&fil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     return XST_SUCCESS;
 }
-int wr_data_sd() 
-{
-    adrSof  = 0x2008700;//skip 1st line
-    nAddre  = 0x2;
-    row     = 1071;
-    col     = 1920;
+int wr_data_sd() {
+    adrSof = 0x2008700;            //skip 1st line
+    nAddre = 0x2;
+    row = 1071;
+    col = 1920;
     int len;
     unsigned char tmp;
     printf("Enter file name with extension\n");
     menu_print_prompt();
     char FileName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(FileName);
-    SD_File  = (char *)FileName;
-    Res = f_mount(&fatfs,Path,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_open(&fil,SD_File,FA_CREATE_ALWAYS|FA_WRITE|FA_READ);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&fil,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf  ("1ST PIXEL VALUE %i\n",(unsigned)(Xil_In16(adrSof) & 0xffff));
-    for(y = 0; y < row; y++) {
+    SD_File = (char *) FileName;
+    res = f_mount(&fatfs, Path, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_open(&fil, SD_File, FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&fil, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("1ST PIXEL VALUE %i\n", (unsigned) (Xil_In16(adrSof) & 0xffff));
+    for (y = 0; y < row; y++) {
         unsigned char buffer[PIXEL_LENGTH] = { 0 };
-        for(x = 0; x < col; x++) {
-            len =snprintf((void*)buffer,sizeof(buffer),"%d ",(Xil_In8(adrSof)));
-            unsigned char *response = (void*)buffer;
+        for (x = 0; x < col; x++) {
+            len = snprintf((void*) buffer, sizeof(buffer), "%d ",
+                    (Xil_In8(adrSof)));
+            unsigned char *response = (void*) buffer;
             adrSof = adrSof + nAddre;
-            Res = f_write(&fil,response,len,&bw);
-            if (Res) {return XST_FAILURE;}
+            res = f_write(&fil, response, len, &bw);
+            if (res) {
+                return XST_FAILURE;
+            }
         }
-        Res = f_write(&fil, "\n", 1, &bw);
-        if (Res != FR_OK) {return XST_FAILURE;}
-   }
-    Res = f_close(&fil);
-    if (Res != FR_OK) {return XST_FAILURE;}
+        res = f_write(&fil, "\n", 1, &bw);
+        if (res != FR_OK) {
+            return XST_FAILURE;
+        }
+    }
+    res = f_close(&fil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     return XST_SUCCESS;
 }
-int rd_wr_data_sd()
-{
-    adrSof  = 0x2008700;//skip 1st line
-    nAddre  = 0x2;
-    row     = 1071;
-    col     = 1920;
+int rd_wr_data_sd() {
+    adrSof = 0x2008700;            //skip 1st line
+    nAddre = 0x2;
+    row = 1071;
+    col = 1920;
     int offset;
     int width;
     int height;
@@ -147,58 +168,82 @@ int rd_wr_data_sd()
     menu_print_prompt();
     char iFilName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(iFilName);
-    SD_File  = (char *)iFilName;
-    Res = f_mount(&fatfs,Path,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_open(&iFil,SD_File,FA_READ);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&iFil,10);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&offset,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&iFil,18);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&width,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&height,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf("width  = %d\n",width);
-    printf("height = %d\n",height);
+    SD_File = (char *) iFilName;
+    res = f_mount(&fatfs, Path, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_open(&iFil, SD_File, FA_READ);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&iFil, 10);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &offset, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&iFil, 18);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &width, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &height, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("width  = %d\n", width);
+    printf("height = %d\n", height);
     printf("Enter n times\n");
     menu_print_prompt();
     nWidth = uart_prompt_io();
-    width  = nWidth*width;
-    height = nWidth*height;
-    printf("width  = %d\n",width);
-    printf("height = %d\n",height);
+    width = nWidth * width;
+    height = nWidth * height;
+    printf("width  = %d\n", width);
+    printf("height = %d\n", height);
     //printf("Enter nWidth\n");
     //menu_print_prompt();
     //nHeight = uart_prompt_io();
-    Res = f_lseek(&iFil, 0);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    res = f_lseek(&iFil, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     printf("FR_OK : 1\n");
-    buffer = (unsigned char *)malloc(offset);
-    if(buffer == NULL) {
-    perror("malloc");
-    exit(-1);}
-    Res = f_read(&iFil,buffer,offset,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    buffer = (unsigned char *) malloc(offset);
+    if (buffer == NULL) {
+        perror("malloc");
+        exit(-1);
+    }
+    res = f_read(&iFil, buffer, offset, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     printf("FR_OK : 2\n");
-    imageData = (unsigned char*)malloc(width*height);
+    imageData = (unsigned char*) malloc(width * height);
     int mod = width % 4;
-    if(mod != 0) {
-    mod = 4 - mod;}
+    if (mod != 0) {
+        mod = 4 - mod;
+    }
     printf("FR_OK : 2\n");
-    for(i = 0; i < height; i++) {
-        for(j = 0; j < width; j++) {
-            Res = f_read(&iFil, &tmp, sizeof(char),&bw);
-            if (Res != FR_OK) {return XST_FAILURE;}
-            imageData[i*width + j] = tmp;
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
+            res = f_read(&iFil, &tmp, sizeof(char), &bw);
+            if (res != FR_OK) {
+                return XST_FAILURE;
+            }
+            imageData[i * width + j] = tmp;
             //printf  ("[%i][%i][%c]\n",i,j,(unsigned char)tmp);
         }
-        for(j = 0; j < mod; j++) {
-            Res = f_read(&iFil, &tmp, sizeof(char),&bw);
-            if (Res != FR_OK) {return XST_FAILURE;}
+        for (j = 0; j < mod; j++) {
+            res = f_read(&iFil, &tmp, sizeof(char), &bw);
+            if (res != FR_OK) {
+                return XST_FAILURE;
+            }
         }
     }
     printf("FR_OK : 3\n");
@@ -206,54 +251,71 @@ int rd_wr_data_sd()
     menu_print_prompt();
     char FileName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(FileName);
-    SD2File  = (char *)FileName;
-    Res = f_open(&oFil,SD2File,FA_CREATE_ALWAYS|FA_WRITE);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_write(&oFil,buffer,offset,&bw);
-    if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-    mod = width % 4;
-    if(mod != 0) {
-    mod = 4 - mod;}
-    printf("mod = %d\n", mod);
-    for(i = 0; i < height; i++) {
-        for(j = 0; j < width; j++) {
-            tmp = (unsigned char)imageData[i*width+j];
-            //printf  ("[%i][%i][%c]\n",i,j,(unsigned char)tmp);
-            Res = f_write(&oFil, &tmp, sizeof(char), &bw);
-            if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-      }
-        for(j = 0; j < mod; j++) {
-            Res = f_write(&oFil,&tmp,sizeof(char),&bw);
-            if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-            //printf  ("[%i][%c]\n",j,tmp);
-      }
+    SD2File = (char *) FileName;
+    res = f_open(&oFil, SD2File, FA_CREATE_ALWAYS | FA_WRITE);
+    if (res != FR_OK) {
+        return XST_FAILURE;
     }
-    //for(i = height-1; i >= 0; i--) {
-    //    for(j = 0; j < width; j++) {
-    //        tmp = (unsigned char)imageData[i*width+j];
-    //        printf  ("[%i][%i][%c]\n",i,j,(unsigned char)tmp);
-    //        Res = f_write(&oFil, &tmp, sizeof(char), &bw);
-    //        if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-    //  }
-    //    for(j = 0; j < mod; j++) {
-    //        Res = f_write(&oFil, &tmp, sizeof(char), &bw);
-    //        if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-    //        printf  ("[%i][%c]\n",j,tmp);
-    //  }
-    //}
-    Res = f_close(&oFil);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_close(&iFil);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    res = f_write(&oFil, buffer, offset, &bw);
+    if (res != FR_OK) {
+        printf("error writing header!\n");
+        return XST_FAILURE;
+    }
+    mod = width % 4;
+    if (mod != 0) {
+        mod = 4 - mod;
+    }
+    printf("mod = %d\n", mod);
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
+            tmp = (unsigned char) imageData[i * width + j];
+            //printf  ("[%i][%i][%c]\n",i,j,(unsigned char)tmp);
+            res = f_write(&oFil, &tmp, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+        }
+        for (j = 0; j < mod; j++) {
+            res = f_write(&oFil, &tmp, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            //printf  ("[%i][%c]\n",j,tmp);
+        }
+    }
+    /*
+     for(i = height-1; i >= 0; i--) {
+     for(j = 0; j < width; j++) {
+     tmp = (unsigned char)imageData[i*width+j];
+     printf  ("[%i][%i][%c]\n",i,j,(unsigned char)tmp);
+     res = f_write(&oFil, &tmp, sizeof(char), &bw);
+     if (res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+     }
+     for(j = 0; j < mod; j++) {
+     res = f_write(&oFil, &tmp, sizeof(char), &bw);
+     if (res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+     printf  ("[%i][%c]\n",j,tmp);
+     }
+     }
+     */
+    res = f_close(&oFil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_close(&iFil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     free(buffer);
     return XST_SUCCESS;
 }
-int Rd_Data_Sd()
-{
-    adrSof  = 0x2008700;//skip 1st line
-    nAddre  = 0x02;
-    row     = 1071;
-    col     = 1920;
+int rd_data_sd() {
+    adrSof = 0x2008700;    //skip 1st line
+    nAddre = 0x02;
+    row = 1071;
+    col = 1920;
     int len;
     int offset;
     int width;
@@ -272,117 +334,160 @@ int Rd_Data_Sd()
     menu_print_prompt();
     char iFilName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(iFilName);
-    SD_File  = (char *)iFilName;
-    Res = f_mount(&fatfs,Path,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_open(&iFil,SD_File,FA_READ);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&iFil,10);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&offset,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&iFil,18);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&width,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&height,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf("width  = %d\n",width);
-    printf("height = %d\n",height);
-    Res = f_lseek(&iFil, 0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf("FR_OK : 1\n");
-    buffer = (unsigned char *)malloc(offset);
-    if(buffer == NULL) {
-    perror("malloc");
-    exit(-1);
+    SD_File = (char *) iFilName;
+    res = f_mount(&fatfs, Path, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
     }
-    Res = f_read(&iFil,buffer,offset,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    res = f_open(&iFil, SD_File, FA_READ);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&iFil, 10);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &offset, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&iFil, 18);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &width, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &height, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("width  = %d\n", width);
+    printf("height = %d\n", height);
+    res = f_lseek(&iFil, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("FR_OK : 1\n");
+    buffer = (unsigned char *) malloc(offset);
+    if (buffer == NULL) {
+        perror("malloc");
+        exit(-1);
+    }
+    res = f_read(&iFil, buffer, offset, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     printf("FR_OK : 2\n");
-   //*widthOut = width;
-   //*heightOut = height;
-   // imageData = (unsigned char*)malloc(width*height);
-   //if(imageData == NULL) {
-   // perror("malloc");
-   // exit(-1);}
+    //*widthOut = width;
+    //*heightOut = height;
+    // imageData = (unsigned char*)malloc(width*height);
+    //if(imageData == NULL) {
+    // perror("malloc");
+    // exit(-1);}
     printf("Enter file name with extension\n");
     menu_print_prompt();
     char FileName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(FileName);
-    SD2File  = (char *)FileName;
-    Res = f_open(&oFil,SD2File,FA_CREATE_ALWAYS|FA_WRITE);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_write(&oFil,buffer,offset,&bw);
-    if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+    SD2File = (char *) FileName;
+    res = f_open(&oFil, SD2File, FA_CREATE_ALWAYS | FA_WRITE);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_write(&oFil, buffer, offset, &bw);
+    if (res != FR_OK) {
+        printf("error writing header!\n");
+        return XST_FAILURE;
+    }
     int mod = width % 4;
-    if(mod != 0) {
-    mod = 4 - mod;}
+    if (mod != 0) {
+        mod = 4 - mod;
+    }
     printf("mod = %d\n", mod);
-    for(i = 0; i < height; i++) {
-         //response = (unsigned char)imageOut[i*cols+j];
+    for (i = 0; i < height; i++) {
+        //response = (unsigned char)imageOut[i*cols+j];
 // Cr = Cr - 128 ;
 // Cb = Cb - 128 ;
 // r = Y + 45 * Cr / 32 ;
 // g = Y - (11 * Cb + 23 * Cr) / 32 ;
 // b = Y + 113 * Cb / 64 ;  
-    // Y  -Red
-    // Cb -Green
-    // Cr -Blue
-         // pRed  = (pGrRe & 0xff);
-         // pGrn  = ((pGrRe & 0xff00) >>8);
-         // pGrReNx = ((Xil_In16(adrSof + nAddre + nAddre) & 0xffff));
+        // Y  -Red
+        // Cb -Green
+        // Cr -Blue
+        // pRed  = (pGrRe & 0xff);
+        // pGrn  = ((pGrRe & 0xff00) >>8);
+        // pGrReNx = ((Xil_In16(adrSof + nAddre + nAddre) & 0xffff));
 //pRed  = (pBlRe & 0xff);
-         //len =snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
-          for(j = 0; j < width; j++) {
-              //pGrRe   = ((Xil_In16(adrSof) & 0xffff));
-              //pBlRe   = ((Xil_In16(adrSof + nAddre) & 0xffff));
-              //pRed    = (pGrRe & 0xff);
-              //pGrn    = ((pGrRe & 0xff00) >>8);
-              //pBle    = ((pBlRe & 0xff00) >>8);
-              //printf("pRed = %d\n", pRed);
+        //len =snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
+        for (j = 0; j < width; j++) {
+            //pGrRe   = ((Xil_In16(adrSof) & 0xffff));
+            //pBlRe   = ((Xil_In16(adrSof + nAddre) & 0xffff));
+            //pRed    = (pGrRe & 0xff);
+            //pGrn    = ((pGrRe & 0xff00) >>8);
+            //pBle    = ((pBlRe & 0xff00) >>8);
+            //printf("pRed = %d\n", pRed);
 //              printf("pGrn = %d\n", pGrn);
 //              printf("pBle = %d\n", pBle);
-              len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
-              unsigned char *responsed1 = (void*)buff;
-              Res      = f_write(&oFil,responsed1,sizeof(char),&bw);
-              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0xff00) >>8));
-              unsigned char *responsed2 = (void*)buff;
-              Res      = f_write(&oFil,responsed2,sizeof(char),&bw);
-              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof + nAddre) & 0xff00) >>8));
-              unsigned char *responsed3 = (void*)buff;
-              response = (void*)buff;
-              Res      = f_write(&oFil,responsed3,sizeof(char),&bw);
-              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              // len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
-              // response = (void*)buff;
-              // Res      = f_write(&oFil,response,len,&bw);
-              // if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              // len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
-              // response = (void*)buff;
-              // Res      = f_write(&oFil,response,len,&bw);
-              // if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+            len = snprintf((void*) buff, sizeof(buff), "%d ",
+                    ((Xil_In16(adrSof) & 0x00ff)));
+            unsigned char *responsed1 = (void*) buff;
+            res = f_write(&oFil, responsed1, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            len = snprintf((void*) buff, sizeof(buff), "%d ",
+                    ((Xil_In16(adrSof) & 0xff00) >> 8));
+            unsigned char *responsed2 = (void*) buff;
+            res = f_write(&oFil, responsed2, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            len = snprintf((void*) buff, sizeof(buff), "%d ",
+                    ((Xil_In16(adrSof + nAddre) & 0xff00) >> 8));
+            unsigned char *responsed3 = (void*) buff;
+            response = (void*) buff;
+            res = f_write(&oFil, responsed3, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            // len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
+            // response = (void*)buff;
+            // res      = f_write(&oFil,response,len,&bw);
+            // if (res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+            // len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
+            // response = (void*)buff;
+            // res      = f_write(&oFil,response,len,&bw);
+            // if (res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
 //              len      = snprintf((void*)buff,sizeof(buff),"%d ",pGrn);
 //              response = (void*)buff;
-//              Res      = f_write(&oFil,response,len,&bw);
-//              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+//              res      = f_write(&oFil,response,len,&bw);
+//              if (res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
 //              len      = snprintf((void*)buff,sizeof(buff),"%d ",pBle);
 //              response = (void*)buff;
-//              Res      = f_write(&oFil,response,len,&bw);
-             // if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              adrSof = adrSof + nAddre;
-      }
-        for(j = 0; j < mod; j++) {
-            Res = f_write(&oFil,response,sizeof(char),&bw);
-            if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-      }
-   } 
-    Res = f_close(&oFil);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_close(&iFil);
-    if (Res != FR_OK) {return XST_FAILURE;}
+//              res      = f_write(&oFil,response,len,&bw);
+            // if (res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+            adrSof = adrSof + nAddre;
+        }
+        for (j = 0; j < mod; j++) {
+            res = f_write(&oFil, response, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+        }
+    }
+    res = f_close(&oFil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_close(&iFil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     free(buffer);
     return XST_SUCCESS;
 //   printf  ("1ST PIXEL VALUE %i\n",(unsigned)(Xil_In16(adrSof) & 0xffff));
@@ -392,15 +497,15 @@ int Rd_Data_Sd()
 //           len =snprintf((void*)buffer,sizeof(buffer),"%d ",(Xil_In16(adrSof)));
 //           unsigned char *response = (void*)buffer;
 //           adrSof = adrSof + nAddre;
-//           Res = f_write(&fil,response,len,&bw);
-//           if (Res) {return XST_FAILURE;}
+//           res = f_write(&fil,response,len,&bw);
+//           if (res) {return XST_FAILURE;}
 //       }
-//       Res = f_write(&fil, "\n", 1, &bw);
-//       if (Res != FR_OK) {return XST_FAILURE;}
+//       res = f_write(&fil, "\n", 1, &bw);
+//       if (res != FR_OK) {return XST_FAILURE;}
 //  }
 ////------------------------------
-//    //Res = f_lseek(&fil, offset);
-//    //if (Res != FR_OK) {return XST_FAILURE;}
+//    //res = f_lseek(&fil, offset);
+//    //if (res != FR_OK) {return XST_FAILURE;}
 //   
 //    int mod = width % 4;
 //    if(mod != 0) {
@@ -412,13 +517,13 @@ int Rd_Data_Sd()
 //    for(i = 0; i < height; i++) {
 //        // add actual data to the image
 //        for(j = 0; j < width; j++) {
-//            Res = f_read(&fil, &tmp, sizeof(char),&bw);
-//            if (Res != FR_OK) {return XST_FAILURE;}
+//            res = f_read(&fil, &tmp, sizeof(char),&bw);
+//            if (res != FR_OK) {return XST_FAILURE;}
 //            imageData[i*width + j] = tmp;
 //        }
 //        for(j = 0; j < mod; j++) {
-//            Res = f_read(&fil, &tmp, sizeof(char),&bw);
-//            if (Res != FR_OK) {return XST_FAILURE;}
+//            res = f_read(&fil, &tmp, sizeof(char),&bw);
+//            if (res != FR_OK) {return XST_FAILURE;}
 //        }
 //    }
 //   
@@ -442,10 +547,10 @@ int Rd_Data_Sd()
 //// }
 //
 //
-//    //Res = f_open(&fil,SD_File,FA_CREATE_ALWAYS|FA_WRITE|FA_READ);
-//    //if (Res != FR_OK) {return XST_FAILURE;}
-////  Res = f_lseek(&fil,0);
-////  if (Res != FR_OK) {return XST_FAILURE;}
+//    //res = f_open(&fil,SD_File,FA_CREATE_ALWAYS|FA_WRITE|FA_READ);
+//    //if (res != FR_OK) {return XST_FAILURE;}
+////  res = f_lseek(&fil,0);
+////  if (res != FR_OK) {return XST_FAILURE;}
 ////  printf  ("1ST PIXEL VALUE %i\n",(unsigned)(Xil_In16(adrSof) & 0xffff));
 ////  for(y = 0; y < row; y++) {
 ////      unsigned char buffer[PIXEL_LENGTH] = { 0 };
@@ -453,76 +558,90 @@ int Rd_Data_Sd()
 ////          len =snprintf((void*)buffer,sizeof(buffer),"%d ",(Xil_In16(adrSof)));
 ////          unsigned char *response = (void*)buffer;
 ////          adrSof = adrSof + nAddre;
-////          Res = f_write(&fil,response,len,&bw);
-////          if (Res) {return XST_FAILURE;}
+////          res = f_write(&fil,response,len,&bw);
+////          if (res) {return XST_FAILURE;}
 ////      }
-////      Res = f_write(&fil, "\n", 1, &bw);
-////      if (Res != FR_OK) {return XST_FAILURE;}
+////      res = f_write(&fil, "\n", 1, &bw);
+////      if (res != FR_OK) {return XST_FAILURE;}
 //// }
-////  Res = f_close(&fil);
-////  if (Res != FR_OK) {return XST_FAILURE;}
+////  res = f_close(&fil);
+////  if (res != FR_OK) {return XST_FAILURE;}
 ////  return XST_SUCCESS;
 //    free(imageData);
 ////------------------------------
-//    Res = f_close(&fil);
-//    if (Res != FR_OK) {return XST_FAILURE;}
+//    res = f_close(&fil);
+//    if (res != FR_OK) {return XST_FAILURE;}
 //    return XST_SUCCESS;
 }
-int writeRawFrameData(int height,int width)
-{
-    FRESULT Res;
+int write_raw_frame_data(int height, int width) {
+    FRESULT res;
     adrSof = pvideo.video_address;
-    printf("adrSof[%x]=%i\n",(unsigned) adrSof,(unsigned) pvideo.pixelvalue);
-    Res = f_mount(&fatfs,Path,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    printf("adrSof[%x]=%i\n", (unsigned) adrSof, (unsigned) pvideo.pixelvalue);
+    res = f_mount(&fatfs, Path, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     printf("Enter FileName with extension\n");
     menu_print_prompt();
     char FileName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(FileName);
-    SD_File  = (char *)FileName;
-    Res = f_open(&fil, SD_File, FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&fil, 0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-       int mod = width % 4;
-       if(mod != 0) {
-          mod = 4 - mod;
-       }
-       //   printf("mod = %d\n", mod);
-       for(i = height-1; i >= 0; i--) {
-          for(j = 0; j < width; j++) {
-          //printf("adrSof[%i]=%i\n",(unsigned) j,(unsigned) (Xil_In16(adrSof) & 0xffff));
-          //dataPack((Xil_In16(adrSof) & 0xffff));
-          char buffer[6] = { 0 };
-          snprintf(buffer, sizeof(buffer), "%d", (Xil_In16(adrSof) & 0xffff));
-          adrSof = adrSof + 0x2;
-         // printf  ("%s\n", buffer);
-             Res = f_write(&fil, (void*)buffer, sizeof(buffer), &bw);
-             if (Res != FR_OK) {return XST_FAILURE;}
-             Res = f_write(&fil,"",1, &bw);
-             if (Res != FR_OK) {return XST_FAILURE;}
-          }
-          // In bmp format, rows must be a multiple of 4-bytes.
-          // So if we're not at a multiple of 4, add junk padding.
-          for(j = 0; j < mod; j++) {
-              char buffer[6];
-              Res = f_write(&fil, (void*)buffer, sizeof(buffer), &bw);
-              if (Res != FR_OK) {return XST_FAILURE;}
-             // printf  ("x %s ", buffer);
-                 Res = f_write(&fil, "\n", 1, &bw);
-                 if (Res != FR_OK) {return XST_FAILURE;}
-          }
-       }
-    Res = f_close(&fil);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    SD_File = (char *) FileName;
+    res = f_open(&fil, SD_File, FA_CREATE_ALWAYS | FA_WRITE | FA_READ);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&fil, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    int mod = width % 4;
+    if (mod != 0) {
+        mod = 4 - mod;
+    }
+    //   printf("mod = %d\n", mod);
+    for (i = height - 1; i >= 0; i--) {
+        for (j = 0; j < width; j++) {
+            //printf("adrSof[%i]=%i\n",(unsigned) j,(unsigned) (Xil_In16(adrSof) & 0xffff));
+            //dataPack((Xil_In16(adrSof) & 0xffff));
+            char buffer[6] = { 0 };
+            snprintf(buffer, sizeof(buffer), "%d", (Xil_In16(adrSof) & 0xffff));
+            adrSof = adrSof + 0x2;
+            // printf  ("%s\n", buffer);
+            res = f_write(&fil, (void*) buffer, sizeof(buffer), &bw);
+            if (res != FR_OK) {
+                return XST_FAILURE;
+            }
+            res = f_write(&fil, "", 1, &bw);
+            if (res != FR_OK) {
+                return XST_FAILURE;
+            }
+        }
+        // In bmp format, rows must be a multiple of 4-bytes.
+        // So if we're not at a multiple of 4, add junk padding.
+        for (j = 0; j < mod; j++) {
+            char buffer[6];
+            res = f_write(&fil, (void*) buffer, sizeof(buffer), &bw);
+            if (res != FR_OK) {
+                return XST_FAILURE;
+            }
+            // printf  ("x %s ", buffer);
+            res = f_write(&fil, "\n", 1, &bw);
+            if (res != FR_OK) {
+                return XST_FAILURE;
+            }
+        }
+    }
+    res = f_close(&fil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     return XST_SUCCESS;
 }
-int write_hd_data_sd()
-{
-    adrSof  = 0x2008700;//skip 1st line
-    nAddre  = 0x02;
-    row     = 1071;
-    col     = 1920;
+int write_hd_data_sd() {
+    adrSof = 0x2008700;          //skip 1st line
+    nAddre = 0x02;
+    row = 1071;
+    col = 1920;
     int len;
     int offset;
     int width;
@@ -531,73 +650,116 @@ int write_hd_data_sd()
     unsigned char buff[PIXEL_LENGTH] = { 0 };
     char iFilName[MAX_STRING_LENGTH] = "RGB.BMP";
     unsigned char *buffer;
-    SD_File  = (char *)iFilName;
-    Res = f_mount(&fatfs,Path,0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_open(&iFil,SD_File,FA_READ);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&iFil,10);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&offset,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_lseek(&iFil,18);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&width,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_read(&iFil,&height,4,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf("width  = %d\n",width);
-    printf("height = %d\n",height);
-    Res = f_lseek(&iFil, 0);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    printf("FR_OK : 1\n");
-    buffer = (unsigned char *)malloc(offset);
-    if(buffer == NULL) {
-    perror("malloc");
-    exit(-1);
+    SD_File = (char *) iFilName;
+    res = f_mount(&fatfs, Path, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
     }
-    Res = f_read(&iFil,buffer,offset,&bw);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    res = f_open(&iFil, SD_File, FA_READ);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&iFil, 10);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &offset, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_lseek(&iFil, 18);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &width, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_read(&iFil, &height, 4, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("width  = %d\n", width);
+    printf("height = %d\n", height);
+    res = f_lseek(&iFil, 0);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    printf("FR_OK : 1\n");
+    buffer = (unsigned char *) malloc(offset);
+    if (buffer == NULL) {
+        perror("malloc");
+        exit(-1);
+    }
+    res = f_read(&iFil, buffer, offset, &bw);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     printf("FR_OK : 2\n");
     printf("Enter file name with extension\n");
     menu_print_prompt();
     char FileName[MAX_STRING_LENGTH] = { 0 };
     char_to_uart(FileName);
-    SD2File  = (char *)FileName;
-    Res = f_open(&oFil,SD2File,FA_CREATE_ALWAYS|FA_WRITE);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_write(&oFil,buffer,offset,&bw);
-    if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
+    SD2File = (char *) FileName;
+    res = f_open(&oFil, SD2File, FA_CREATE_ALWAYS | FA_WRITE);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_write(&oFil, buffer, offset, &bw);
+    if (res != FR_OK) {
+        printf("error writing header!\n");
+        return XST_FAILURE;
+    }
     int mod = width % 4;
-    if(mod != 0) {
-    mod = 4 - mod;}
+    if (mod != 0) {
+        mod = 4 - mod;
+    }
     printf("mod = %d\n", mod);
-    for(i = 0; i < height; i++) {
-          for(j = 0; j < width; j++) {
-              len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0x00ff)));
-              unsigned char *responsed1 = (void*)buff;
-              Res      = f_write(&oFil,responsed1,sizeof(char),&bw);
-              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof) & 0xff00) >>8));
-              unsigned char *responsed2 = (void*)buff;
-              Res      = f_write(&oFil,responsed2,sizeof(char),&bw);
-              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              len      = snprintf((void*)buff,sizeof(buff),"%d ",((Xil_In16(adrSof + nAddre) & 0xff00) >>8));
-              unsigned char *responsed3 = (void*)buff;
-              response = (void*)buff;
-              Res      = f_write(&oFil,responsed3,sizeof(char),&bw);
-              if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-              adrSof = adrSof + nAddre;
-      }
-        for(j = 0; j < mod; j++) {
-            Res = f_write(&oFil,response,sizeof(char),&bw);
-            if (Res != FR_OK) { printf("error writing header!\n"); return XST_FAILURE;}
-      }
-   }
-    Res = f_close(&oFil);
-    if (Res != FR_OK) {return XST_FAILURE;}
-    Res = f_close(&iFil);
-    if (Res != FR_OK) {return XST_FAILURE;}
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
+            len = snprintf((void*) buff, sizeof(buff), "%d ",
+                    ((Xil_In16(adrSof) & 0x00ff)));
+            unsigned char *responsed1 = (void*) buff;
+            res = f_write(&oFil, responsed1, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            len = snprintf((void*) buff, sizeof(buff), "%d ",
+                    ((Xil_In16(adrSof) & 0xff00) >> 8));
+            unsigned char *responsed2 = (void*) buff;
+            res = f_write(&oFil, responsed2, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            len = snprintf((void*) buff, sizeof(buff), "%d ",
+                    ((Xil_In16(adrSof + nAddre) & 0xff00) >> 8));
+            unsigned char *responsed3 = (void*) buff;
+            response = (void*) buff;
+            res = f_write(&oFil, responsed3, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+            adrSof = adrSof + nAddre;
+        }
+        for (j = 0; j < mod; j++) {
+            res = f_write(&oFil, response, sizeof(char), &bw);
+            if (res != FR_OK) {
+                printf("error writing header!\n");
+                return XST_FAILURE;
+            }
+        }
+    }
+    res = f_close(&oFil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
+    res = f_close(&iFil);
+    if (res != FR_OK) {
+        return XST_FAILURE;
+    }
     free(buffer);
     return XST_SUCCESS;
 }

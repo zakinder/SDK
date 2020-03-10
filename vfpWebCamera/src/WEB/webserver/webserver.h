@@ -36,6 +36,6 @@ int start_web_application();
 unsigned volatile char * CONVERT_CHAR_S(char *str);
 void FLOATING_POINT_NUMBER_AFTERPOINT(float n, char *res, int afterpoint);
 int platform_init_fs();
-int fk1,fk2;
-float f1,f2;
+int fk1, fk2;
+float f1, f2;
 #endif

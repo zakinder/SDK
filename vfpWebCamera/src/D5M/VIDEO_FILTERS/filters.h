@@ -4,21 +4,20 @@
 #include <xbasic_types.h>
 
 /****************************************************************
-KERNELS COEF STRUCT
-*****************************************************************/
-struct kStruct
-{
-   Xuint16 K1;
-   Xuint16 K2;
-   Xuint16 K3;
-   Xuint16 K4;
-   Xuint16 K5;
-   Xuint16 K6;
-   Xuint16 K7;
-   Xuint16 K8;
-   Xuint16 K9;
-   Xuint16 Kc;
-   Xuint16 Vid;
+ KERNELS COEF STRUCT
+ *****************************************************************/
+struct kStruct {
+    Xuint16 K1;
+    Xuint16 K2;
+    Xuint16 K3;
+    Xuint16 K4;
+    Xuint16 K5;
+    Xuint16 K6;
+    Xuint16 K7;
+    Xuint16 K8;
+    Xuint16 K9;
+    Xuint16 Kc;
+    Xuint16 Vid;
 };
 typedef struct kStruct Coef;
 Coef pYcCf;
@@ -32,36 +31,34 @@ Coef pPyCf;
 Coef pEmCf;
 Coef pCg1Cf;
 Coef pCf;
-struct kInStruct
-{
-   Xint16 K1;
-   Xint16 K2;
-   Xint16 K3;
-   Xint16 K4;
-   Xint16 K5;
-   Xint16 K6;
-   Xint16 K7;
-   Xint16 K8;
-   Xint16 K9;
-   Xint16 Kc;
-   Xint16 Vid;
+struct kInStruct {
+    Xint16 K1;
+    Xint16 K2;
+    Xint16 K3;
+    Xint16 K4;
+    Xint16 K5;
+    Xint16 K6;
+    Xint16 K7;
+    Xint16 K8;
+    Xint16 K9;
+    Xint16 Kc;
+    Xint16 Vid;
 };
 typedef struct kInStruct InCoef;
 InCoef pInCoef;
-struct KeypressStruct
-{
-   Xuint16 ValueDown;
-   Xuint16 ValueUp;
-   Xuint16 ValueLeft;
-   Xuint16 ValueRight;
-   Xuint16 ValueMax;
+struct KeypressStruct {
+    Xuint16 ValueDown;
+    Xuint16 ValueUp;
+    Xuint16 ValueLeft;
+    Xuint16 ValueRight;
+    Xuint16 ValueMax;
 };
 typedef struct KeypressStruct KeyVal;
 KeyVal pKey;
 void CgCoef(Coef *pCf);
 void CgainInit();
 void pKeyInit();
-void CgainConfig(u16 kValues,Coef *pCgCf);
+void CgainConfig(u16 kValues, Coef *pCgCf);
 void KeyPrValue();
 void kernel_config(Coef *pCf);
 void keyCgainConfigSelect();

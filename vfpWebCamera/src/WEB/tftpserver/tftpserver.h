@@ -8,11 +8,7 @@
 #define TFTP_MAX_RETRIES 3
 #define TFTP_TIMEOUT_INTERVAL 5
 typedef enum {
-    TFTP_RRQ = 1,
-    TFTP_WRQ = 2,
-    TFTP_DATA = 3,
-    TFTP_ACK = 4,
-    TFTP_ERROR = 5
+    TFTP_RRQ = 1, TFTP_WRQ = 2, TFTP_DATA = 3, TFTP_ACK = 4, TFTP_ERROR = 5
 } tftp_opcode;
 typedef enum {
     TFTP_ERR_NOTDEFINED,
@@ -25,10 +21,10 @@ typedef enum {
     TFTP_ERR_NO_SUCH_USER,
 } tftp_errorcode;
 typedef struct {
-    int op;        
+    int op;
     int fd;
-    char data[TFTP_MAX_MSG_LEN];    
-    int  data_len;
+    char data[TFTP_MAX_MSG_LEN];
+    int data_len;
     struct ip_addr to_ip;
     int to_port;
     int block;

@@ -86,10 +86,10 @@ void timer_callback()
 void xadapter_fasttimer_handler(void)
 {
     timer_callback();
-        XTmrCtr_SetControlStatusReg(PLATFORM_TIMER_BASEADDR, 0, XTC_CSR_INT_OCCURED_MASK | XTC_CSR_LOAD_MASK);
-        XTmrCtr_SetControlStatusReg(PLATFORM_TIMER_BASEADDR, 0,
-                    XTC_CSR_ENABLE_TMR_MASK | XTC_CSR_ENABLE_INT_MASK
-                    | XTC_CSR_AUTO_RELOAD_MASK | XTC_CSR_DOWN_COUNT_MASK);
+    XTmrCtr_SetControlStatusReg(PLATFORM_TIMER_BASEADDR, 0, XTC_CSR_INT_OCCURED_MASK | XTC_CSR_LOAD_MASK);
+    XTmrCtr_SetControlStatusReg(PLATFORM_TIMER_BASEADDR, 0,
+            XTC_CSR_ENABLE_TMR_MASK | XTC_CSR_ENABLE_INT_MASK
+            | XTC_CSR_AUTO_RELOAD_MASK | XTC_CSR_DOWN_COUNT_MASK);
 }
 #else
 void xadapter_timer_handler(void *p)
@@ -97,8 +97,8 @@ void xadapter_timer_handler(void *p)
     timer_callback();
     XTmrCtr_SetControlStatusReg(PLATFORM_TIMER_BASEADDR, 0, XTC_CSR_INT_OCCURED_MASK | XTC_CSR_LOAD_MASK);
     XTmrCtr_SetControlStatusReg(PLATFORM_TIMER_BASEADDR, 0,
-                XTC_CSR_ENABLE_TMR_MASK | XTC_CSR_ENABLE_INT_MASK
-                | XTC_CSR_AUTO_RELOAD_MASK | XTC_CSR_DOWN_COUNT_MASK);
+            XTC_CSR_ENABLE_TMR_MASK | XTC_CSR_ENABLE_INT_MASK
+            | XTC_CSR_AUTO_RELOAD_MASK | XTC_CSR_DOWN_COUNT_MASK);
     XIntc_AckIntr(XPAR_INTC_0_BASEADDR, PLATFORM_TIMER_INTERRUPT_MASK);
 }
 #endif
@@ -114,7 +114,7 @@ platform_setup_timer()
 #if XPAR_INTC_0_HAS_FAST == 1
     XIntc_RegisterFastHandler(XPAR_INTC_0_BASEADDR,
             PLATFORM_TIMER_INTERRUPT_INTR,
-                (XFastInterruptHandler)xadapter_fasttimer_handler);
+            (XFastInterruptHandler)xadapter_fasttimer_handler);
 #else
     XIntc_RegisterHandler(XPAR_INTC_0_BASEADDR,
             PLATFORM_TIMER_INTERRUPT_INTR,
@@ -136,10 +136,10 @@ void
 platform_setup_timer()
 {
 #ifdef XPAR_CPU_PPC440_CORE_CLOCK_FREQ_HZ
-        XExc_RegisterHandler(XEXC_ID_DEC_INT, (XExceptionHandler)xadapter_timer_handler, NULL);
-        XTime_DECSetInterval(PIT_INTERVAL);
-        XTime_TSRClearStatusBits(XREG_TSR_CLEAR_ALL);
-        XTime_DECEnableAutoReload();
+    XExc_RegisterHandler(XEXC_ID_DEC_INT, (XExceptionHandler)xadapter_timer_handler, NULL);
+    XTime_DECSetInterval(PIT_INTERVAL);
+    XTime_TSRClearStatusBits(XREG_TSR_CLEAR_ALL);
+    XTime_DECEnableAutoReload();
 #else
     XExc_RegisterHandler(XEXC_ID_PIT_INT, (XExceptionHandler)xadapter_timer_handler, NULL);
     XTime_PITSetInterval(PIT_INTERVAL);
@@ -163,14 +163,14 @@ void platform_setup_interrupts()
     platform_setup_timer();
     Xil_ExceptionInit();
     Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-                (Xil_ExceptionHandler) XIntc_InterruptHandler,
-                intcp);
+            (Xil_ExceptionHandler) XIntc_InterruptHandler,
+            intcp);
 #ifdef XPAR_ETHERNET_MAC_IP2INTC_IRPT_MASK
     XIntc_EnableIntr(XPAR_XPS_INTC_0_BASEADDR,
 #ifdef __MICROBLAZE__
             PLATFORM_TIMER_INTERRUPT_MASK |
 #endif
-                XPAR_ETHERNET_MAC_IP2INTC_IRPT_MASK);
+            XPAR_ETHERNET_MAC_IP2INTC_IRPT_MASK);
 #endif
 #ifdef XPAR_INTC_0_LLTEMAC_0_VEC_ID
 #ifdef __MICROBLAZE__
@@ -236,11 +236,9 @@ disable_caches()
 #define INTC_DIST_BASE_ADDR    XPAR_SCUGIC_DIST_BASEADDR
 #define TIMER_IRPT_INTR        XPAR_SCUTIMER_INTR
 static XScuTimer TimerInstance;
-static XUartPs Uart_Pss_0;    
+static XUartPs Uart_Pss_0;
 volatile int TxPerfConnMonCntr = 0;
-void
-timer_callback(XScuTimer * TimerInstance)
-{
+void timer_callback(XScuTimer * TimerInstance) {
 #if LWIP_DHCP==1
     static int dhcp_timer = 0;
 #endif
@@ -264,8 +262,7 @@ timer_callback(XScuTimer * TimerInstance)
     }
     XScuTimer_ClearInterruptStatus(TimerInstance);
 }
-int Init_ScuTimer(void)
-{
+int Init_ScuTimer(void) {
     int Status = XST_SUCCESS;
     XScuTimer_Config *ConfigPtr;
     int TimerLoadValue = 0;
@@ -273,7 +270,8 @@ int Init_ScuTimer(void)
     Status = XScuTimer_CfgInitialize(&TimerInstance, ConfigPtr,
             ConfigPtr->BaseAddr);
     if (Status != XST_SUCCESS) {
-        xil_printf("In %s: Scutimer Cfg initialization failed...\r\n", __func__);
+        xil_printf("In %s: Scutimer Cfg initialization failed...\r\n",
+                __func__);
         return XST_FAILURE;
     }
     Status = XScuTimer_SelfTest(&TimerInstance);
@@ -286,71 +284,63 @@ int Init_ScuTimer(void)
     XScuTimer_LoadTimer(&TimerInstance, TimerLoadValue);
     return XST_SUCCESS;
 }
-int Init_UART(void)
-{
+int Init_UART(void) {
     int Status = XST_SUCCESS;
     XUartPs_Config *Config_0;
     Config_0 = XUartPs_LookupConfig(UART_DEVICE_ID);
     if (NULL == Config_0) {
         return XST_FAILURE;
     }
-    Status = XUartPs_CfgInitialize(&Uart_Pss_0, Config_0, Config_0->BaseAddress);
+    Status = XUartPs_CfgInitialize(&Uart_Pss_0, Config_0,
+            Config_0->BaseAddress);
     if (Status != XST_SUCCESS) {
         return XST_FAILURE;
     }
     XUartPs_SetBaudRate(&Uart_Pss_0, 9600);
     return XST_SUCCESS;
 }
-int SetupIntrSystem( XScuTimer * TimerInstancePtr,
-        u16 TimerIntrId)
-{
+int SetupIntrSystem(XScuTimer * TimerInstancePtr, u16 TimerIntrId) {
     Xil_ExceptionInit();
     XScuGic_DeviceInitialize(INTC_DEVICE_ID);
     Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-                        (Xil_ExceptionHandler)XScuGic_DeviceInterruptHandler,
-                        (void *)INTC_DEVICE_ID);
-    XScuGic_RegisterHandler(INTC_BASE_ADDR,
-                            TimerIntrId,
-                            (Xil_ExceptionHandler)timer_callback,
-                            (void *)&TimerInstance);
+            (Xil_ExceptionHandler) XScuGic_DeviceInterruptHandler,
+            (void *) INTC_DEVICE_ID);
+    XScuGic_RegisterHandler(INTC_BASE_ADDR, TimerIntrId,
+            (Xil_ExceptionHandler) timer_callback, (void *) &TimerInstance);
     XScuGic_EnableIntr(INTC_DIST_BASE_ADDR, TimerIntrId);
     return XST_SUCCESS;
 }
-void platform_enable_interrupts()
-{
+void platform_enable_interrupts() {
     Xil_ExceptionEnableMask(XIL_EXCEPTION_IRQ);
     XScuTimer_EnableInterrupt(&TimerInstance);
     XScuTimer_Start(&TimerInstance);
 }
 #endif
-int
-init_platform()
-{
+int init_platform() {
 #if __MICROBLAZE__ || __PPC__
-        enable_caches();
+    enable_caches();
 #ifdef PLATFORM_STDOUT_IS_16550
-        XUartNs550_SetBaud(PLATFORM_STDOUT_BASEADDR, XPAR_XUARTNS550_CLOCK_HZ, PLATFORM_BAUDRATE);
-        XUartNs550_mSetLineControlReg(PLATFORM_STDOUT_BASEADDR, XUN_LCR_8_DATA_BITS);
+    XUartNs550_SetBaud(PLATFORM_STDOUT_BASEADDR, XPAR_XUARTNS550_CLOCK_HZ, PLATFORM_BAUDRATE);
+    XUartNs550_mSetLineControlReg(PLATFORM_STDOUT_BASEADDR, XUN_LCR_8_DATA_BITS);
 #endif
     platform_setup_interrupts();
     if (platform_init_fs() < 0)
-            return -1;
+    return -1;
 #endif
 #ifdef __arm__
-    if (Init_ScuTimer()  != XST_SUCCESS) while(1);
+    if (Init_ScuTimer() != XST_SUCCESS) while (1)
+        ;
     SetupIntrSystem(&TimerInstance, TIMER_IRPT_INTR);
-    if (platform_init_fs() < 0)
-            return -1;
+    if (platform_init_fs() < 0) return -1;
 #endif
-        return 0;
+    return 0;
 }
-void cleanup_platform()
-{
+void cleanup_platform() {
 #if __MICROBLAZE__ || __PPC__
-        disable_caches();
+    disable_caches();
 #endif
 #ifdef __arm__
-        Xil_ICacheDisable();
-        Xil_DCacheDisable();
+    Xil_ICacheDisable();
+    Xil_DCacheDisable();
 #endif
 }

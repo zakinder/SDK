@@ -9,20 +9,15 @@
 #endif
 static unsigned echo_port = 7;
 static unsigned echo_server_running = 0;
-int
-transfer_echo_data() {
+int transfer_echo_data() {
     return 0;
 }
-void
-print_echo_app_header()
-{
-    xil_printf("%20s %6d %s\r\n", "echo server",
-                        echo_port,
-                        "$ telnet <board_ip> 7");
+void print_echo_app_header() {
+    xil_printf("%20s %6d %s\r\n", "echo server", echo_port,
+            "$ telnet <board_ip> 7");
 }
-static err_t
-echo_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
-{
+static err_t echo_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p,
+        err_t err) {
     if (!p) {
         tcp_close(tpcb);
         tcp_recv(tpcb, NULL);
@@ -35,18 +30,14 @@ echo_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     pbuf_free(p);
     return ERR_OK;
 }
-static err_t
-echo_accept_callback(void *arg, struct tcp_pcb *newpcb, err_t err)
-{
+static err_t echo_accept_callback(void *arg, struct tcp_pcb *newpcb, err_t err) {
     static int connection = 1;
     tcp_recv(newpcb, echo_recv_callback);
-    tcp_arg(newpcb, (void*)connection);
+    tcp_arg(newpcb, (void*) connection);
     connection++;
     return ERR_OK;
 }
-int
-start_echo_application()
-{
+int start_echo_application() {
     struct tcp_pcb *pcb;
     err_t err;
     pcb = tcp_new();

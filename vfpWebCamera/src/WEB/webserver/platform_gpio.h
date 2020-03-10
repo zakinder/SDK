@@ -3,7 +3,7 @@
 
 #include <xbasic_types.h>
 
-typedef unsigned long    un32bits;//Unsign 32 bits
+typedef unsigned long un32bits; //Unsign 32 bits
 void platform_init_gpios();
 int TOGGLE_LEDS();
 unsigned int GET_SWITCH_STATE();
@@ -45,8 +45,7 @@ int rch28signal();
 int rch29signal();
 int rch30signal();
 int rch31signal();
-typedef struct adc_channels_read_on_interrupt
-{
+typedef struct adc_channels_read_on_interrupt {
     un32bits ch00;
     un32bits ch01;
     un32bits ch02;
@@ -80,8 +79,7 @@ typedef struct adc_channels_read_on_interrupt
     un32bits ch30;
     un32bits ch31;
 } plregisters;
-typedef struct adc_channels_read_after_interrupt
-{
+typedef struct adc_channels_read_after_interrupt {
     un32bits ch00;
     un32bits ch01;
     un32bits ch02;
@@ -115,8 +113,6 @@ typedef struct adc_channels_read_after_interrupt
     un32bits ch30;
     un32bits ch31;
 } channel;
-
-
 
 void read_adc_channels(plregisters *interrupt);
 plregisters interrupt;

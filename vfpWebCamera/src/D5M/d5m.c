@@ -5,8 +5,7 @@
 #include "VIDEO_FILTERS/filters.h"
 
 //Set and write all filters kernal coefficients and system default configurable registers
-void d5m()
-{
+void d5m() {
     //Write d5m camera config values on i2c bus
     camera_hdmi_config();
     //Set All Filters Kernal Coefficients

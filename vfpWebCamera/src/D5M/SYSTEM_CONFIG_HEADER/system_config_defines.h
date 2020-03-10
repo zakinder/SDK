@@ -1,17 +1,17 @@
 // LAST TESTED : 12/27/2019
 #ifndef __SYSTEM_CONFIG_DEFINES_H__
 #define __SYSTEM_CONFIG_DEFINES_H__
-#define ONESECOND    0x13D92D3F
-#define ONE_SECOND 3250000000
-#define READ_WRITE_MUL_FACTOR 0x10
-#define DEFAULT_HYPERTERMINAL_UART_ID XPAR_PS7_UART_1_DEVICE_ID
-#define UART_BASEADDR        XPAR_XUARTPS_1_BASEADDR
-#define UART_ADDRESS XPAR_PS7_UART_1_BASEADDR
-#define D5M_BASE XPAR_PS_VIDEO_D5M_VFP_VFPCONFIG_BASEADDR
+//#define ONESECOND    0x13D92D3F
+//#define ONE_SECOND 3250000000
+//#define READ_WRITE_MUL_FACTOR 0x10
+//#define DEFAULT_HYPERTERMINAL_UART_ID XPAR_PS7_UART_1_DEVICE_ID
+//#define UART_BASEADDR   XPAR_XUARTPS_1_BASEADDR
+#define UART_ADDRESS    XPAR_PS7_UART_1_BASEADDR
+#define D5M_BASE        XPAR_PS_VIDEO_D5M_VFP_VFPCONFIG_BASEADDR
 /*****************************************************************************************************************/
-#define D5M_mWriteReg(BaseAddress, RegOffset, Data) \
+#define d5m_write_reg(BaseAddress, RegOffset, Data) \
       Xil_Out32((BaseAddress) + (RegOffset), (u32)(Data))
-#define D5M_mReadReg(BaseAddress, RegOffset) \
+#define d5m_read_reg(BaseAddress, RegOffset) \
     Xil_In32((BaseAddress) + (RegOffset))
 /*****************************************************************************************************************/
 //OFFSETS
@@ -94,8 +94,8 @@
 #define YccPerChCb                 2
 #define YccPerChCr                 3
 /****************************************************************
-YCBCR
-*****************************************************************/
+ YCBCR
+ *****************************************************************/
 #define kCoefVals_kCoeffYcbcr_k1   0x0101//--  0.257
 #define kCoefVals_kCoeffYcbcr_k2   0x01F8//--  0.504
 #define kCoefVals_kCoeffYcbcr_k3   0x0062//--  0.098
@@ -107,8 +107,8 @@ YCBCR
 #define kCoefVals_kCoeffYcbcr_k9   0xFFB9//-- -0.071
 #define kCoefVals_kCoeffYcbcr_kSet 1
 /****************************************************************
-CGAIN_1
-*****************************************************************/
+ CGAIN_1
+ *****************************************************************/
 #define kCoefVals_kCoef1Cgain_k1   0x05DC//--  1500  =  1.500
 #define kCoefVals_kCoef1Cgain_k2   0xFF06//-- -250   = -0.250
 #define kCoefVals_kCoef1Cgain_k3   0xFE0C//-- -500   = -0.500
@@ -119,8 +119,8 @@ CGAIN_1
 #define kCoefVals_kCoef1Cgain_k8   0xFE0C//-- -500   = -0.500
 #define kCoefVals_kCoef1Cgain_k9   0x05DC//--  1500  =  1.500
 /****************************************************************
-CGAIN_2
-*****************************************************************/
+ CGAIN_2
+ *****************************************************************/
 #define kCoefVals_kCoef2Cgain_k1   0x05DC//--  1375  =  1.500
 #define kCoefVals_kCoef2Cgain_k2   0xFF06//-- -250   = -0.250
 #define kCoefVals_kCoef2Cgain_k3   0xFF83//-- -500   = -0.125
@@ -131,8 +131,8 @@ CGAIN_2
 #define kCoefVals_kCoef2Cgain_k8   0xFF83//-- -500   = -0.125
 #define kCoefVals_kCoef2Cgain_k9   0x05DC//--  1375  =  1.500
 /****************************************************************
-CGAIN_3
-*****************************************************************/
+ CGAIN_3
+ *****************************************************************/
 #define kCoefVals_kCoef3Cgain_k1   0x05DC//--  1375  =  1.500
 #define kCoefVals_kCoef3Cgain_k2   0xFF83//-- -250   = -0.125
 #define kCoefVals_kCoef3Cgain_k3   0xFF83//-- -500   = -0.125
@@ -143,8 +143,8 @@ CGAIN_3
 #define kCoefVals_kCoef3Cgain_k8   0xFF83//-- -500   = -0.125
 #define kCoefVals_kCoef3Cgain_k9   0x05DC//--  1375  =  1.500
 /****************************************************************
-CGAIN_4
-*****************************************************************/
+ CGAIN_4
+ *****************************************************************/
 #define kCoefVals_kCoef4Cgain_k1   0x04E2//--  1375  =  1.250
 #define kCoefVals_kCoef4Cgain_k2   0xFF83//-- -250   = -0.125
 #define kCoefVals_kCoef4Cgain_k3   0xFF83//-- -500   = -0.125
@@ -155,8 +155,8 @@ CGAIN_4
 #define kCoefVals_kCoef4Cgain_k8   0xFF83//-- -500   = -0.125
 #define kCoefVals_kCoef4Cgain_k9   0x04E2//--  1375  =  1.250
 /****************************************************************
-CGAIN_5
-*****************************************************************/
+ CGAIN_5
+ *****************************************************************/
 #define kCoefVals_kCoef5Cgain_k1   0x04E2//--  1375  =  1.250
 #define kCoefVals_kCoef5Cgain_k2   0xFF83//-- -250   = -0.125
 #define kCoefVals_kCoef5Cgain_k3   0xFF83//-- -500   = -0.125
@@ -167,8 +167,8 @@ CGAIN_5
 #define kCoefVals_kCoef5Cgain_k8   0xFF83//-- -500   = -0.125
 #define kCoefVals_kCoef5Cgain_k9   0x04E2//--  1375  =  1.250
 /****************************************************************
-CGAIN_6
-*****************************************************************/
+ CGAIN_6
+ *****************************************************************/
 #define kCoefVals_kCoef6Cgain_k1   0x055F//--  1375  =  1.375
 #define kCoefVals_kCoef6Cgain_k2   0xFF83//-- -250   = -0.125
 #define kCoefVals_kCoef6Cgain_k3   0xFF83//-- -500   = -0.125
@@ -179,8 +179,8 @@ CGAIN_6
 #define kCoefVals_kCoef6Cgain_k8   0xFF83//-- -500   = -0.125
 #define kCoefVals_kCoef6Cgain_k9   0x055F//--  1375  =  1.375
 /****************************************************************
-CGAIN_7
-*****************************************************************/
+ CGAIN_7
+ *****************************************************************/
 #define kCoefVals_kCoef7Cgain_k1   0x055F//--  1375  =  1.375
 #define kCoefVals_kCoef7Cgain_k2   0xFF06//-- -250   = -0.250
 #define kCoefVals_kCoef7Cgain_k3   0xFF83//-- -500   = -0.125
@@ -193,8 +193,8 @@ CGAIN_7
 #define kCoefVals_kCoeffCgain_kSet 2
 #define kCoefVals_kCoef2Cgain_kSet 8
 /****************************************************************
-SHARP
-*****************************************************************/
+ SHARP
+ *****************************************************************/
 #define kCoefVals_kCoeffSharp_k1   0x0000//--  0
 #define kCoefVals_kCoeffSharp_k2   0xFE0C//-- -0.5
 #define kCoefVals_kCoeffSharp_k3   0x0000//--  0
@@ -206,8 +206,8 @@ SHARP
 #define kCoefVals_kCoeffSharp_k9   0x0000//--  0
 #define kCoefVals_kCoeffSharp_kSet 3
 /****************************************************************
-BLURE
-*****************************************************************/
+ BLURE
+ *****************************************************************/
 #define kCoefVals_kCoeffBlure_k1   0x006F//-- 0.111
 #define kCoefVals_kCoeffBlure_k2   0x006F//-- 0.111
 #define kCoefVals_kCoeffBlure_k3   0x006F//-- 0.111
@@ -219,12 +219,12 @@ BLURE
 #define kCoefVals_kCoeffBlure_k9   0x006F//-- 0.111
 #define kCoefVals_kCoeffBlure_kSet 4
 /****************************************************************
-SOBEL_X
-*****************************************************************/
-    //  GX
-    //  [-1 +0 +1]
-    //  [-2 +0 +2]
-    //  [-1 +0 +1]
+ SOBEL_X
+ *****************************************************************/
+//  GX
+//  [-1 +0 +1]
+//  [-2 +0 +2]
+//  [-1 +0 +1]
 #define kCoefVals_kCoefXSobel_k1   0xFC18//--  [-1]
 #define kCoefVals_kCoefXSobel_k2   0x0000//--  [+0]
 #define kCoefVals_kCoefXSobel_k3   0x03E8//--  [+1]
@@ -236,12 +236,12 @@ SOBEL_X
 #define kCoefVals_kCoefXSobel_k9   0x03E8//--  [+1]
 #define kCoefVals_kCoefXSobel_kSet 5
 /****************************************************************
-SOBEL_Y
-*****************************************************************/
-    //  GY
-    //  [+1 +2 +1]
-    //  [+0 +0 +0]
-    //  [-1 -2 -1]
+ SOBEL_Y
+ *****************************************************************/
+//  GY
+//  [+1 +2 +1]
+//  [+0 +0 +0]
+//  [-1 -2 -1]
 #define kCoefVals_kCoefYSobel_k1   0x03E8//--  [+1]
 #define kCoefVals_kCoefYSobel_k2   0x07D0//--  [+2]
 #define kCoefVals_kCoefYSobel_k3   0x03E8//--  [+1]
@@ -253,8 +253,8 @@ SOBEL_Y
 #define kCoefVals_kCoefYSobel_k9   0xFC18//--  [-1]
 #define kCoefVals_kCoefYSobel_kSet 6
 /****************************************************************
-EMBOS
-*****************************************************************/
+ EMBOS
+ *****************************************************************/
 #define kCoefVals_kCoeffEmbos_k1   0xFC18//-- -1
 #define kCoefVals_kCoeffEmbos_k2   0xFC18//-- -1
 #define kCoefVals_kCoeffEmbos_k3   0x0000//--  0
@@ -266,8 +266,8 @@ EMBOS
 #define kCoefVals_kCoeffEmbos_k9   0x03E8//--  1
 #define kCoefVals_kCoeffEmbos_kSet 7
 /****************************************************************
-PREWIT_X
-*****************************************************************/
+ PREWIT_X
+ *****************************************************************/
 //  GX
 //  [+1 +0 -1]
 //  [+1 +0 -1]
@@ -283,8 +283,8 @@ PREWIT_X
 #define kCoefVals_kCoefXPrewit_k9   0xFC18//--  [-1]
 #define kCoefVals_kCoefXPrewit_kSet 5
 /****************************************************************
-PREWIT_Y
-*****************************************************************/
+ PREWIT_Y
+ *****************************************************************/
 //  GY
 //  [+1 +1 +1]
 //  [+0 +0 +0]
@@ -309,8 +309,8 @@ PREWIT_Y
 #define w_dchannel_reg_6            24
 #define w_cchannel_reg_7            28
 /****************************************************************
-KERNEL
-*****************************************************************/
+ KERNEL
+ *****************************************************************/
 #define w_kernal_1_reg_08           32
 #define w_kernal_2_reg_09           36
 #define w_kernal_3_reg_10           40
@@ -323,8 +323,8 @@ KERNEL
 #define w_kernalconfig_reg_17       68
 #define w_kSet_reg_17               68
 /****************************************************************
-UNSED KERNEL
-*****************************************************************/
+ UNSED KERNEL
+ *****************************************************************/
 #define w_a11fl_reg_21              84
 #define w_a12fl_reg_22              88
 #define w_a13fl_reg_23              92

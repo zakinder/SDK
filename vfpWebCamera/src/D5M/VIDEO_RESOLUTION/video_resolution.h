@@ -3,8 +3,7 @@
 
 #include <xbasic_types.h>
 
-struct struct_vres_timing_t
-{
+struct struct_vres_timing_t {
     char *pName;
     Xuint32 VActiveVideo;
     Xuint32 VFrontPorch;
@@ -18,9 +17,9 @@ struct struct_vres_timing_t
     Xuint32 HSyncPolarity;
 };
 typedef struct struct_vres_timing_t vres_timing_t;
-char *  vres_get_name(Xuint32 resolutionId);
+char * vres_get_name(Xuint32 resolutionId);
 Xuint32 vres_get_width(Xuint32 resolutionId);
 Xuint32 vres_get_height(Xuint32 resolutionId);
-Xuint32 vres_get_timing(Xuint32 resolutionId, vres_timing_t *pTiming );
-Xint32 vres_detect( Xuint32 width, Xuint32 height );
+Xuint32 vres_get_timing(Xuint32 resolutionId, vres_timing_t *pTiming);
+Xint32 vres_detect(Xuint32 width, Xuint32 height);
 #endif // __VIDEO_RESOLUTION_H__

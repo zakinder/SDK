@@ -20,7 +20,7 @@
 #define NUM_COL_BITS        XPAR_S6DDR_0_MEM_NUM_COL_BITS
 #define MEM_WIDTH        XPAR_S6DDR_0_NUM_DQ_PINS
 #ifndef MEM_OFFSET
- #define MEM_OFFSET        0x00004000
+#define MEM_OFFSET        0x00004000
 #endif
 /*
  * Bit masks for the tests that are to be done on the memory.
@@ -35,7 +35,7 @@
  * Tests to be done. All the tests are enabled by default.
  */
 #ifndef S6_DDRX_TEST
- #define S6_DDRX_TEST    (S6_DDRX_TEST_0 | S6_DDRX_TEST_1 | S6_DDRX_TEST_2 | \
+#define S6_DDRX_TEST    (S6_DDRX_TEST_0 | S6_DDRX_TEST_1 | S6_DDRX_TEST_2 | \
              S6_DDRX_TEST_3 | S6_DDRX_TEST_4)
 #endif
 /*
@@ -50,13 +50,13 @@
  * S6_DDRX_CACHE_TEST_0 and S6_DDRX_CACHE_TEST_1 are enabled by default.
  */
 #ifndef S6_DDRX_CACHE_TEST
- #define S6_DDRX_CACHE_TEST    (S6_DDRX_CACHE_TEST_0 | S6_DDRX_CACHE_TEST_1)
+#define S6_DDRX_CACHE_TEST    (S6_DDRX_CACHE_TEST_0 | S6_DDRX_CACHE_TEST_1)
 #endif
 /*
  * Specifies how many passes of the test to run, -1 == infinite.
  */
 #ifndef NUM_ITERATIONS
- #define NUM_ITERATIONS        1
+#define NUM_ITERATIONS        1
 #endif
 /**************************** Type Definitions ********************************/
 /*
@@ -169,9 +169,9 @@ typedef volatile u32 *U32Ptr;
  */
 XAxiVdma AxiVdma;
 #ifdef XPAR_INTC_0_DEVICE_ID
-static XIntc Intc;    /* Instance of the Interrupt Controller */
+static XIntc Intc; /* Instance of the Interrupt Controller */
 #else
-static XScuGic Intc;    /* Instance of the Interrupt Controller */
+static XScuGic Intc; /* Instance of the Interrupt Controller */
 #endif
 /* Data address
  *
@@ -195,7 +195,8 @@ static int WriteError;
 static int ReadSetup(XAxiVdma *InstancePtr);
 static int WriteSetup(XAxiVdma * InstancePtr);
 static int StartTransfer(XAxiVdma *InstancePtr);
-static int SetupIntrSystem(XAxiVdma *AxiVdmaPtr, u16 ReadIntrId,u16 WriteIntrId);
+static int SetupIntrSystem(XAxiVdma *AxiVdmaPtr, u16 ReadIntrId,
+        u16 WriteIntrId);
 static void DisableIntrSystem(u16 ReadIntrId, u16 WriteIntrId);
 /* Interrupt call back functions
  */
@@ -205,14 +206,13 @@ static void WriteCallBack(void *CallbackRef, u32 Mask);
 static void WriteErrorCallBack(void *CallbackRef, u32 Mask);
 static int VdmaStart(void);
 u16 frame[V_ACTIVE][H_STRIDE];
-void VdmaInit()
-{
+void vdma_init() {
     int status;
-    ReadFrameAddr    = READ_ADDRESS_BASE;
-    WriteFrameAddr   = WRITE_ADDRESS_BASE;
+    ReadFrameAddr = READ_ADDRESS_BASE;
+    WriteFrameAddr = WRITE_ADDRESS_BASE;
     BlockStartOffset = SUBFRAME_START_OFFSET;
-    BlockHoriz       = SUBFRAME_HORIZONTAL_SIZE;
-    BlockVert        = SUBFRAME_VERTICAL_SIZE;
+    BlockHoriz = SUBFRAME_HORIZONTAL_SIZE;
+    BlockVert = SUBFRAME_VERTICAL_SIZE;
     DISABLE_DCACHE();
     xil_printf("\r\n--- Entering main() --- \r\n");
     status = VdmaStart();
@@ -220,13 +220,13 @@ void VdmaInit()
         xil_printf("Configuration Initialization failed %d\r\n", status);
     }
 }
-int VdmaStart(void){
+int VdmaStart(void) {
     int status;
     int i = 0;
     u16 *fptr2 = (void *) READ_ADDRESS_BASE;
     xil_printf("pointer to address %d\r\n", fptr2);
     xil_printf("value at init %d\r\n", *fptr2);
-    u16 *fptr =&frame;
+    u16 *fptr = &frame;
     fptr = fptr2;
     xil_printf("&frame %d\r\n", &frame);
     xil_printf("&frame %d\r\n", frame);
@@ -238,15 +238,17 @@ int VdmaStart(void){
     //print("Getting Config\n\r");
     VdmaConfig = XAxiVdma_LookupConfig(XPAR_AXIVDMA_0_DEVICE_ID);
     if (!VdmaConfig) {
-        xil_printf("No video DMA found for ID %d\r\n", XPAR_AXIVDMA_0_DEVICE_ID);
+        xil_printf("No video DMA found for ID %d\r\n",
+        XPAR_AXIVDMA_0_DEVICE_ID);
         return XST_FAILURE;
     }
     //print("Setting Config\n\r");
     //set config
-    status = XAxiVdma_CfgInitialize(&AxiVdma, VdmaConfig, VdmaConfig->BaseAddress);
+    status = XAxiVdma_CfgInitialize(&AxiVdma, VdmaConfig,
+            VdmaConfig->BaseAddress);
     if (status != XST_SUCCESS) {
         xil_printf("Configuration Initialization failed %d\r\n", status);
-            return XST_FAILURE;
+        return XST_FAILURE;
     }
     XAxiVdma_DmaStop(&AxiVdma, XAXIVDMA_READ);
     XAxiVdma_DmaStop(&AxiVdma, XAXIVDMA_WRITE);
@@ -257,12 +259,12 @@ int VdmaStart(void){
     ReadCfg.VertSizeInput = V_ACTIVE;
     ReadCfg.HoriSizeInput = H_STRIDE;
     ReadCfg.Stride = H_STRIDE;
-    ReadCfg.FrameDelay = 0;  /* This example does not test frame delay */
+    ReadCfg.FrameDelay = 0; /* This example does not test frame delay */
     ReadCfg.EnableCircularBuf = 1;
-    ReadCfg.EnableSync = 0;  /* No Gen-Lock */
-    ReadCfg.PointNum = 0;    /* No Gen-Lock */
+    ReadCfg.EnableSync = 0; /* No Gen-Lock */
+    ReadCfg.PointNum = 0; /* No Gen-Lock */
     ReadCfg.EnableFrameCounter = 0; /* Endless transfers */
-    ReadCfg.FrameStoreStartAddr[0] = (u32)&frame; /* We are not doing parking */
+    ReadCfg.FrameStoreStartAddr[0] = (u32) &frame; /* We are not doing parking */
     //ReadCfg.FixedFrameStoreAddr = READ_ADDRESS_BASE; /* We are not doing parking */
     //print("Setting Read Config\n\r");
     status = XAxiVdma_DmaConfig(&AxiVdma, XAXIVDMA_READ, &ReadCfg);
@@ -271,12 +273,13 @@ int VdmaStart(void){
         return XST_FAILURE;
     }
     Addr = READ_ADDRESS_BASE;
-    for(i = 0; i < NUMBER_OF_READ_FRAMES; i++) {
-            ReadCfg.FrameStoreStartAddr[i] = Addr;
-            Addr += H_STRIDE * V_ACTIVE;
+    for (i = 0; i < NUMBER_OF_READ_FRAMES; i++) {
+        ReadCfg.FrameStoreStartAddr[i] = Addr;
+        Addr += H_STRIDE * V_ACTIVE;
     }
     xil_printf("frame %d\r\n", frame[0][0]);
-    status = XAxiVdma_DmaSetBufferAddr(&AxiVdma, XAXIVDMA_READ, ReadCfg.FrameStoreStartAddr);
+    status = XAxiVdma_DmaSetBufferAddr(&AxiVdma, XAXIVDMA_READ,
+            ReadCfg.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Read channel set buffer address failed %d\r\n", status);
         return XST_FAILURE;
@@ -284,10 +287,10 @@ int VdmaStart(void){
     WriteCfg.VertSizeInput = V_ACTIVE;
     WriteCfg.HoriSizeInput = H_STRIDE;
     WriteCfg.Stride = H_STRIDE;
-    WriteCfg.FrameDelay = 1;  /* This example does not test frame delay */
+    WriteCfg.FrameDelay = 1; /* This example does not test frame delay */
     WriteCfg.EnableCircularBuf = 1;
-    WriteCfg.EnableSync = 0;  /* No Gen-Lock */
-    WriteCfg.PointNum = 0;    /* No Gen-Lock */
+    WriteCfg.EnableSync = 0; /* No Gen-Lock */
+    WriteCfg.PointNum = 0; /* No Gen-Lock */
     WriteCfg.EnableFrameCounter = 0; /* Endless transfers */
     WriteCfg.FixedFrameStoreAddr = 0; /* We are not doing parking */
     //print("Setting Write Config\n\r");
@@ -297,20 +300,21 @@ int VdmaStart(void){
         return XST_FAILURE;
     }
     Addr = WRITE_ADDRESS_BASE;
-    for(i = 0; i < NUMBER_OF_WRITE_FRAMES; i++) {
+    for (i = 0; i < NUMBER_OF_WRITE_FRAMES; i++) {
         WriteCfg.FrameStoreStartAddr[i] = Addr;
         Addr += H_STRIDE * V_ACTIVE;
     }
     xil_printf("WAddr %d\r\n", Addr);
     xil_printf("frame %d\r\n", frame[0][0]);
-    status = XAxiVdma_DmaSetBufferAddr(&AxiVdma, XAXIVDMA_WRITE, WriteCfg.FrameStoreStartAddr);
+    status = XAxiVdma_DmaSetBufferAddr(&AxiVdma, XAXIVDMA_WRITE,
+            WriteCfg.FrameStoreStartAddr);
     if (status != XST_SUCCESS) {
         xil_printf("Write channel set buffer address failed %d\r\n", status);
         return XST_FAILURE;
     }
     //start transfer
     //print("Starting Transfer\n\r");
-    status =  XAxiVdma_DmaStart(&AxiVdma, XAXIVDMA_WRITE);
+    status = XAxiVdma_DmaStart(&AxiVdma, XAXIVDMA_WRITE);
     if (status != XST_SUCCESS) {
         xil_printf("DMA write start failed %d\r\n", status);
         return XST_FAILURE;
@@ -325,38 +329,72 @@ int VdmaStart(void){
 //    }
     //XAxiVdma_DmaRegisterDump(&AxiVdma, XAXIVDMA_WRITE);
     print("Write channel dump\n\r");
-    xil_printf("\tS2MM DMA Control Register: %x\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_CR_OFFSET));
-    xil_printf("\tS2MM DMA Status Register: %x\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_SR_OFFSET));
-    xil_printf("\tHI_FRMBUF Reg: %x\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_HI_FRMBUF_OFFSET));
-    xil_printf("\tFRMSTORE Reg: %d\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_FRMSTORE_OFFSET));
-    xil_printf("\tBUFTHRES Reg: %d\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_BUFTHRES_OFFSET));
-    xil_printf("\tS2MM Vertical Size Register: %d\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_VSIZE_OFFSET));
-    xil_printf("\tS2MM Horizontal Size Register: %d\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_HSIZE_OFFSET));
-    xil_printf("\tS2MM Frame Delay and Stride Register: %d\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_STRD_FRMDLY_OFFSET));
-    xil_printf("\tS2MM Start Address 1: %x\r\n",XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase, XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_START_ADDR_OFFSET));
+    xil_printf("\tS2MM DMA Control Register: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_CR_OFFSET));
+    xil_printf("\tS2MM DMA Status Register: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_SR_OFFSET));
+    xil_printf("\tHI_FRMBUF Reg: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_HI_FRMBUF_OFFSET));
+    xil_printf("\tFRMSTORE Reg: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_FRMSTORE_OFFSET));
+    xil_printf("\tBUFTHRES Reg: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_BUFTHRES_OFFSET));
+    xil_printf("\tS2MM Vertical Size Register: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_VSIZE_OFFSET));
+    xil_printf("\tS2MM Horizontal Size Register: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_HSIZE_OFFSET));
+    xil_printf("\tS2MM Frame Delay and Stride Register: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_STRD_FRMDLY_OFFSET));
+    xil_printf("\tS2MM Start Address 1: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.WriteChannel.ChanBase,
+                    XAXIVDMA_S2MM_ADDR_OFFSET + XAXIVDMA_START_ADDR_OFFSET));
     xil_printf("\n");
     print("Read channel dump\n\r");
     //XAxiVdma_DmaRegisterDump(&AxiVdma, XAXIVDMA_READ);
-    xil_printf("\tMM2S DMA Control Register: %x\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_CR_OFFSET));
-    xil_printf("\tMM2S DMA Status Register: %x\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_SR_OFFSET));
-    xil_printf("\tMM2S HI_FRMBUF Reg: %x\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_HI_FRMBUF_OFFSET));
-    xil_printf("\tFRMSTORE Reg: %d\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_FRMSTORE_OFFSET));
-    xil_printf("\tBUFTHRES Reg: %d\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_BUFTHRES_OFFSET));
-    xil_printf("\tMM2S Vertical Size Register: %d\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_VSIZE_OFFSET));
-    xil_printf("\tMM2S Horizontal Size Register: %d\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_HSIZE_OFFSET));
-    xil_printf("\tMM2S Frame Delay and Stride Register: %d\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_STRD_FRMDLY_OFFSET));
-    xil_printf("\tMM2S Start Address 1: %x\r\n",XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_START_ADDR_OFFSET));
+    xil_printf("\tMM2S DMA Control Register: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_CR_OFFSET));
+    xil_printf("\tMM2S DMA Status Register: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase, XAXIVDMA_SR_OFFSET));
+    xil_printf("\tMM2S HI_FRMBUF Reg: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_HI_FRMBUF_OFFSET));
+    xil_printf("\tFRMSTORE Reg: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_FRMSTORE_OFFSET));
+    xil_printf("\tBUFTHRES Reg: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_BUFTHRES_OFFSET));
+    xil_printf("\tMM2S Vertical Size Register: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_VSIZE_OFFSET));
+    xil_printf("\tMM2S Horizontal Size Register: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_HSIZE_OFFSET));
+    xil_printf("\tMM2S Frame Delay and Stride Register: %d\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_STRD_FRMDLY_OFFSET));
+    xil_printf("\tMM2S Start Address 1: %x\r\n",
+            XAxiVdma_ReadReg(AxiVdma.ReadChannel.ChanBase,
+                    XAXIVDMA_MM2S_ADDR_OFFSET + XAXIVDMA_START_ADDR_OFFSET));
     xil_printf("pointer to address %d\r\n", fptr);
     xil_printf("value at init %d\r\n", *fptr);
     xil_printf("pointer to address %d\r\n", fptr2);
     xil_printf("value at init %d\r\n", *fptr2);
     /*
-    status =  XAxiVdma_DmaStart(&AxiVdma, XAXIVDMA_READ);
-    if (status != XST_SUCCESS) {
-        xil_printf("DMA read start failed %d\r\n", status);
-        return XST_FAILURE;
-    }
-    */
+     status =  XAxiVdma_DmaStart(&AxiVdma, XAXIVDMA_READ);
+     if (status != XST_SUCCESS) {
+     xil_printf("DMA read start failed %d\r\n", status);
+     return XST_FAILURE;
+     }
+     */
     //print("Start transfer\n\r");
     return XST_SUCCESS;
 }

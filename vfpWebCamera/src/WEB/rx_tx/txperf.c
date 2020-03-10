@@ -15,9 +15,7 @@ static struct tcp_pcb *connected_pcb = NULL;
 volatile extern int TxPerfConnMonCntr;
 static char send_buf[SEND_BUFSIZE];
 static unsigned txperf_client_connected = 0;
-int
-transfer_txperf_data()
-{
+int transfer_txperf_data() {
 #if __arm__
     int copy = 3;
 #else
@@ -25,8 +23,7 @@ transfer_txperf_data()
 #endif
     err_t err;
     struct tcp_pcb *tpcb = connected_pcb;
-    if (!connected_pcb)
-        return ERR_OK;
+    if (!connected_pcb) return ERR_OK;
     while (tcp_sndbuf(tpcb) > SEND_BUFSIZE) {
         err = tcp_write(tpcb, send_buf, SEND_BUFSIZE, copy);
         if (err != ERR_OK) {
@@ -36,7 +33,7 @@ transfer_txperf_data()
         }
         err = tcp_output(tpcb);
         if (err != ERR_OK) {
-            xil_printf("txperf: Error on tcp_output: %d\r\n",err);
+            xil_printf("txperf: Error on tcp_output: %d\r\n", err);
         }
     }
     if (TxPerfConnMonCntr == 20) {
@@ -47,14 +44,12 @@ transfer_txperf_data()
         }
         err = tcp_output(tpcb);
         if (err != ERR_OK) {
-            xil_printf("txperf: Error on tcp_output: %d\r\n",err);
+            xil_printf("txperf: Error on tcp_output: %d\r\n", err);
         }
     }
     return 0;
 }
-static err_t
-txperf_sent_callback(void *arg, struct tcp_pcb *tpcb, u16_t len)
-{
+static err_t txperf_sent_callback(void *arg, struct tcp_pcb *tpcb, u16_t len) {
 #if __arm__
     int copy = 3;
 #else
@@ -71,14 +66,13 @@ txperf_sent_callback(void *arg, struct tcp_pcb *tpcb, u16_t len)
         }
         err = tcp_output(tpcb);
         if (err != ERR_OK) {
-            xil_printf("txperf: Error on tcp_output: %d\r\n",err);
+            xil_printf("txperf: Error on tcp_output: %d\r\n", err);
         }
     }
     return ERR_OK;
 }
-static err_t
-txperf_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err)
-{
+static err_t txperf_connected_callback(void *arg, struct tcp_pcb *tpcb,
+        err_t err) {
     xil_printf("txperf: Connected to iperf server\r\n");
     txperf_client_connected = 1;
     connected_pcb = tpcb;
@@ -86,9 +80,7 @@ txperf_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err)
     tcp_sent(tpcb, txperf_sent_callback);
     return ERR_OK;
 }
-int
-start_txperf_application()
-{
+int start_txperf_application() {
     struct tcp_pcb *pcb;
     struct ip_addr ipaddr;
     err_t err;
@@ -99,10 +91,10 @@ start_txperf_application()
         xil_printf("txperf: Error creating PCB. Out of Memory\r\n");
         return -1;
     }
-    IP4_ADDR(&ipaddr,  192, 168,   1, 100);        
-    port = 5001;                    
+    IP4_ADDR(&ipaddr, 192, 168, 1, 100);
+    port = 5001;
     err = tcp_connect(pcb, &ipaddr, port, txperf_connected_callback);
-        txperf_client_connected = 0;
+    txperf_client_connected = 0;
     if (err != ERR_OK) {
         xil_printf("txperf: tcp_connect returned error: %d\r\n", err);
         return err;
@@ -111,10 +103,7 @@ start_txperf_application()
         send_buf[i] = (i % 10) + '0';
     return 0;
 }
-void
-print_txperf_app_header()
-{
-        xil_printf("%20s %6s %s\r\n", "txperf client",
-                        "N/A",
-                        "$ iperf -s -i 5 -w 64k (on host with IP 192.168.1.100)");
+void print_txperf_app_header() {
+    xil_printf("%20s %6s %s\r\n", "txperf client", "N/A",
+            "$ iperf -s -i 5 -w 64k (on host with IP 192.168.1.100)");
 }
